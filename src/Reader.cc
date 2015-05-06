@@ -902,7 +902,10 @@ namespace orc {
                const ReaderOptions& options);
 
     const ReaderOptions& getReaderOptions() const;
+
     CompressionKind getCompression() const override;
+
+    std::string getFormatVersion() const override;
 
     unsigned long getNumberOfRows() const override;
 
@@ -1056,6 +1059,17 @@ namespace orc {
         stripeInfo.datalength(),
         stripeInfo.footerlength(),
         stripeInfo.numberofrows()));
+  }
+
+  std::string ReaderImpl::getFormatVersion() const {
+    std::string result;
+    for(int i=0; i < postscript.version_size(); ++i) {
+      if (i != 0) {
+        result += ".";
+      }
+      result += std::to_string(postscript.version(i));
+    }
+    return result;
   }
 
   unsigned long ReaderImpl::getNumberOfRows() const {
@@ -1397,7 +1411,13 @@ namespace orc {
   }
 
   void ReaderImpl::checkOrcVersion() {
-    // TODO
+    std::string version = getFormatVersion();
+    if (version != "0.11" && version != "0.12") {
+      *(options.getErrorStream())
+        << "Warning: ORC file " << stream->getName()
+        << " was written in an unknown format version "
+        << version << "\n";
+    }
   }
 
   bool ReaderImpl::next(ColumnVectorBatch& data) {

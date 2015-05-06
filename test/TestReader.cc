@@ -37,6 +37,7 @@ namespace orc {
     std::string filename;
     std::string json;
     std::string typeString;
+    std::string formatVersion;
     uint64_t rowCount;
     uint64_t contentLength;
     uint64_t stripeCount;
@@ -48,6 +49,7 @@ namespace orc {
     OrcFileDescription(const std::string& _filename,
                        const std::string& _json,
                        const std::string& _typeString,
+                       const std::string& _version,
                        uint64_t _rowCount,
                        uint64_t _contentLength,
                        uint64_t _stripeCount,
@@ -58,6 +60,7 @@ namespace orc {
                        ): filename(_filename),
                           json(_json),
                           typeString(_typeString),
+                          formatVersion(_version),
                           rowCount(_rowCount),
                           contentLength(_contentLength),
                           stripeCount(_stripeCount),
@@ -110,6 +113,7 @@ namespace orc {
     EXPECT_EQ(GetParam().rowCount, reader->getNumberOfRows());
     EXPECT_EQ(GetParam().rowIndexStride, reader->getRowIndexStride());
     EXPECT_EQ(GetParam().contentLength, reader->getContentLength());
+    EXPECT_EQ(GetParam().formatVersion, reader->getFormatVersion());
     EXPECT_EQ(getFilename(), reader->getStreamName());
     EXPECT_EQ(GetParam().userMeta.size(), reader->getMetadataKeys().size());
     for(std::map<std::string, std::string>::const_iterator itr =
@@ -169,6 +173,7 @@ namespace orc {
                     OrcFileDescription("TestOrcFile.columnProjection.orc",
                                        "TestOrcFile.columnProjection.jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        21000,
                                        428406,
                                        5,
@@ -187,6 +192,7 @@ namespace orc {
                                        "list:array<struct<int1:int,string1:"
                                        "string>>,map:map<string,struct<int1:"
                                        "int,string1:string>>>",
+                                       "0.12",
                                        0,
                                        3,
                                        0,
@@ -205,6 +211,7 @@ namespace orc {
                                        "list:array<struct<int1:int,string1:"
                                        "string>>,map:map<string,struct<int1:"
                                        "int,string1:string>>>",
+                                       "0.12",
                                        1,
                                        980,
                                        1,
@@ -223,6 +230,7 @@ namespace orc {
                                        "list:array<struct<int1:int,string1:"
                                        "string>>,map:map<string,struct<int1:"
                                        "int,string1:string>>>",
+                                       "0.12",
                                        2,
                                        1015,
                                        1,
@@ -235,6 +243,7 @@ namespace orc {
                                        "TestOrcFile.testMemoryManagementV11"
                                        ".jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.11",
                                        2500,
                                        18779,
                                        25,
@@ -247,6 +256,7 @@ namespace orc {
                                        "TestOrcFile.testMemoryManagementV12"
                                        ".jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        2500,
                                        10618,
                                        4,
@@ -258,6 +268,7 @@ namespace orc {
                                        "TestOrcFile.testPredicatePushdown"
                                        ".jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        3500,
                                        15529,
                                        1,
@@ -275,6 +286,7 @@ namespace orc {
                                        "string>>>,list:array<struct<int1:int,"
                                        "string1:string>>,map:map<string,"
                                        "struct<int1:int,string1:string>>>",
+                                       "0.12",
                                        32768,
                                        1896379,
                                        7,
@@ -285,6 +297,7 @@ namespace orc {
                     OrcFileDescription("TestOrcFile.testSnappy.orc",
                                        "TestOrcFile.testSnappy.jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        10000,
                                        126061,
                                        2,
@@ -297,6 +310,7 @@ namespace orc {
                                        "TestOrcFile.testStringAndBinaryStat"
                                        "istics.jsn.gz",
                                        "struct<bytes1:binary,string1:string>",
+                                       "0.12",
                                        4,
                                        185,
                                        1,
@@ -308,6 +322,7 @@ namespace orc {
                                        "TestOrcFile.testStripeLevelStats"
                                        ".jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        11000,
                                        597,
                                        3,
@@ -318,6 +333,7 @@ namespace orc {
                     OrcFileDescription("TestOrcFile.testTimestamp.orc",
                                        "TestOrcFile.testTimestamp.jsn.gz",
                                        "timestamp",
+                                       "0.11",
                                        12,
                                        188,
                                        1,
@@ -330,6 +346,7 @@ namespace orc {
                                        ".jsn.gz",
                                        "struct<time:timestamp,union:uniontype"
                                        "<int,string>,decimal:decimal(38,18)>",
+                                       "0.12",
                                        5077,
                                        20906,
                                        2,
@@ -340,6 +357,7 @@ namespace orc {
                     OrcFileDescription("TestOrcFile.testWithoutIndex.orc",
                                        "TestOrcFile.testWithoutIndex.jsn.gz",
                                        "struct<int1:int,string1:string>",
+                                       "0.12",
                                        50000,
                                        214643,
                                        10,
@@ -350,6 +368,7 @@ namespace orc {
                     OrcFileDescription("decimal.orc",
                                        "decimal.jsn.gz",
                                        "struct<_col0:decimal(10,5)>",
+                                       "0.12",
                                        6000,
                                        16186,
                                        1,
@@ -363,6 +382,7 @@ namespace orc {
                                         "_col2:string,_col3:string,_col4:int,"
                                         "_col5:string,_col6:int,_col7:int,"
                                         "_col8:int>"),
+                                       "0.11",
                                        1920800,
                                        5069718,
                                        385,
@@ -376,6 +396,7 @@ namespace orc {
                                         "_col2:string,_col3:string,_col4:int,"
                                         "_col5:string,_col6:int,_col7:int,"
                                         "_col8:int>"),
+                                       "0.11",
                                        1920800,
                                        396823,
                                        385,
@@ -389,6 +410,7 @@ namespace orc {
                                         "_col2:string,_col3:string,_col4:int,"
                                         "_col5:string,_col6:int,_col7:int,"
                                         "_col8:int>"),
+                                       "0.12",
                                        1920800,
                                        45592,
                                        1,
@@ -401,6 +423,7 @@ namespace orc {
                                        ("struct<_col0:tinyint,_col1:smallint,"
                                         "_col2:int,_col3:bigint,_col4:float,"
                                         "_col5:double,_col6:boolean>"),
+                                       "0.12",
                                        70000,
                                        366347,
                                        1,
@@ -421,6 +444,7 @@ namespace orc {
                                         "<string,struct<int1:int,string1:"
                                         "string>>,ts:timestamp,"
                                         "decimal1:decimal(0,0)>"),
+                                       "0.11",
                                        7500,
                                        372542,
                                        2,
@@ -433,6 +457,7 @@ namespace orc {
                                        ("struct<userid:bigint,string1:string,"
                                         "subtype:double,decimal1:decimal(0,0),"
                                         "ts:timestamp>"),
+                                       "0.12",
                                        25000,
                                        245568,
                                        5,
@@ -447,6 +472,7 @@ namespace orc {
                                        "_col5:double,_col6:boolean,"
                                        "_col7:string,_col8:timestamp,"
                                        "_col9:decimal(4,2),_col10:binary>",
+                                       "0.12",
                                        2098,
                                        41780,
                                        2,
@@ -461,6 +487,7 @@ INSTANTIATE_TEST_CASE_P(TestReader1900, MatchTest,
                     OrcFileDescription("TestOrcFile.testDate1900.orc",
                                        "TestOrcFile.testDate1900.jsn.gz",
                                        "struct<time:timestamp,date:date>",
+                                       "0.12",
                                        70000,
                                        30478,
                                        8,
@@ -476,6 +503,7 @@ INSTANTIATE_TEST_CASE_P(TestReader1900, MatchTest,
                     OrcFileDescription("TestOrcFile.testDate2038.orc",
                                        "TestOrcFile.testDate2038.jsn.gz",
                                        "struct<time:timestamp,date:date>",
+                                       "0.12",
                                        212000,
                                        94762,
                                        28,
@@ -752,6 +780,20 @@ TEST(Reader, noStripeStatistics) {
 
   EXPECT_EQ(0, reader->getNumberOfStripeStatistics());
 }
+
+  TEST(Reader, futureFormatVersion) {
+    std::ostringstream filename;
+    filename << exampleDirectory << "/version1999.orc";
+    orc::ReaderOptions opts;
+    std::ostringstream errorMsg;
+    opts.setErrorStream(errorMsg);
+    std::unique_ptr<orc::Reader> reader =
+      orc::createReader(orc::readLocalFile(filename.str()), opts);
+    EXPECT_EQ(("Warning: ORC file " + filename.str() + 
+               " was written in an unknown format version 19.99\n"),
+              errorMsg.str());
+    EXPECT_EQ("19.99", reader->getFormatVersion());
+  }
 
   std::map<std::string, std::string> makeMetadata() {
     std::map<std::string, std::string> result;

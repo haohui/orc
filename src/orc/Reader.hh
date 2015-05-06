@@ -534,6 +534,13 @@ namespace orc {
     virtual ~Reader();
 
     /**
+     * Get the format version of the file. Currently known values are:
+     * "0.11" and "0.12"
+     * @return the version string
+     */
+    virtual std::string getFormatVersion() const = 0;
+
+    /**
      * Get the number of rows in the file.
      * @return the number of rows
      */
