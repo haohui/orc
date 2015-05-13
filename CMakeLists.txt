@@ -19,12 +19,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 set (GMOCK_VERSION "1.7.0")
 include_directories(
-  ${CMAKE_SOURCE_DIR}/libs/gmock-${GMOCK_VERSION}/include
-  ${CMAKE_SOURCE_DIR}/libs/gmock-${GMOCK_VERSION}/gtest/include
+  ${CMAKE_SOURCE_DIR}/third_party/gmock-${GMOCK_VERSION}/include
+  ${CMAKE_SOURCE_DIR}/third_party/gmock-${GMOCK_VERSION}/gtest/include
   )
 
 if (MSVC)
-  set (GMOCK_LIB "${CMAKE_BINARY_DIR}/libs/gmock-${GMOCK_VERSION}/gmock_main")
+  set (GMOCK_LIB "${CMAKE_BINARY_DIR}/third_party/gmock-${GMOCK_VERSION}/gmock_main")
   set (PROTOBUF_VERSION "2.6.0")
   set (ZLIB_VERSION "1.2.8")
   add_definitions (-D_SCL_SECURE_NO_WARNINGS)
@@ -44,11 +44,11 @@ if (MSVC)
   
   if (NOT Protobuf_FOUND)
     include_directories(
-    ${CMAKE_SOURCE_DIR}/libs/protobuf-${PROTOBUF_VERSION}/include
+    ${CMAKE_SOURCE_DIR}/third_party/protobuf-${PROTOBUF_VERSION}/include
     )
-    set (PROTOBUF_PROTOC_EXECUTABLE ${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/protoc.exe)
-    set (PROTOBUF_LITE_LIBRARIES "${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf-lite.lib")
-    set (PROTOBUF_LIBRARIES "${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf.lib")
+    set (PROTOBUF_PROTOC_EXECUTABLE ${CMAKE_BINARY_DIR}/third_party/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/protoc.exe)
+    set (PROTOBUF_LITE_LIBRARIES "${CMAKE_BINARY_DIR}/third_party/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf-lite.lib")
+    set (PROTOBUF_LIBRARIES "${CMAKE_BINARY_DIR}/third_party/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf.lib")
     message (STATUS "PROTOBUF_LIBRARIES = ${PROTOBUF_LIBRARIES}")
     message (STATUS "PROTOBUF_LITE_LIBRARIES = ${PROTOBUF_LITE_LIBRARIES}")
     message (STATUS "PROTOBUF_LIBRARY = ${PROTOBUF_LIBRARY}")
@@ -58,15 +58,15 @@ if (MSVC)
   find_package(ZLIB)
   
   if (NOT ZLIB_FOUND)
-    set (ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/zlib-${ZLIB_VERSION}/include)
+    set (ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/third_party/zlib-${ZLIB_VERSION}/include)
     include_directories(${ZLIB_INCLUDE_DIR})
-    set (ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/libs/zlib-${ZLIB_VERSION}/${CMAKE_CFG_INTDIR}/zlibstaticd.lib")
+    set (ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/third_party/zlib-${ZLIB_VERSION}/${CMAKE_CFG_INTDIR}/zlibstaticd.lib")
     message (STATUS "ZLIB_INCLUDE_DIR = ${ZLIB_INCLUDE_DIR}")
     message (STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
   endif (NOT ZLIB_FOUND)
   
 else(MSVC)
-  set (GMOCK_LIB "${CMAKE_BINARY_DIR}/libs/gmock-${GMOCK_VERSION}/libgmock_main.a")
+  set (GMOCK_LIB "${CMAKE_BINARY_DIR}/third_party/gmock-${GMOCK_VERSION}/libgmock_main.a")
 
   find_package (Protobuf REQUIRED)
   MESSAGE( STATUS "PROTOBUF_INCLUDE_DIR:       " ${PROTOBUF_INCLUDE_DIR} )
@@ -118,8 +118,14 @@ endif (NOT MSVC)
 
 set (EXAMPLE_DIRECTORY ${CMAKE_SOURCE_DIR}/examples)
 
-add_subdirectory(libs)
+add_subdirectory(third_party)
 add_subdirectory(src)
 if(NOT C09)
   add_subdirectory(test)
 endif(NOT C09)
+
+configure_file (
+  "include/orc/orc-config.hh.in"
+  "include/orc/orc-config.hh"
+  )
+
