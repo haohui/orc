@@ -76,12 +76,6 @@ cxx_library(gmock
             "${gtest_dir}/src/gtest-all.cc"
             src/gmock-all.cc)
 
-cxx_library(gmock_main
-            "${cxx_strict}"
-            "${gtest_dir}/src/gtest-all.cc"
-            src/gmock-all.cc
-            src/gmock_main.cc)
-
 ########################################################################
 #
 # Google Mock's own tests.

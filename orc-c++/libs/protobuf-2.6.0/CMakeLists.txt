@@ -10,53 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# We only need protobuf for Windows build. In other POSIX systems,
-# protobuf is installed as a prebuilt step automatically.
+INCLUDE (CheckIncludeFileCXX)
+CHECK_INCLUDE_FILE_CXX("tr1/unordered_map" HAVE_TR1)
+CONFIGURE_FILE(config.h.cmake config.h)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+                    ${CMAKE_CURRENT_SOURCE_DIR}
+		    ${CMAKE_CURRENT_BINARY_DIR})
+
 if (MSVC)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/vsprojects)
-  add_library(libprotobuf STATIC
-    src/google/protobuf/io/coded_stream.h
-    src/google/protobuf/io/coded_stream_inl.h
-    vsprojects/config.h
-    src/google/protobuf/descriptor.h
-    src/google/protobuf/descriptor.pb.h
-    src/google/protobuf/descriptor_database.h
-    src/google/protobuf/dynamic_message.h
-    src/google/protobuf/extension_set.h
-    src/google/protobuf/generated_message_reflection.h
-    src/google/protobuf/generated_message_util.h
-    src/google/protobuf/io/gzip_stream.h
-    src/google/protobuf/io/strtod.h
-    src/google/protobuf/stubs/hash.h
-    src/google/protobuf/compiler/importer.h
-    src/google/protobuf/stubs/map_util.h
-    src/google/protobuf/message.h
-    src/google/protobuf/message_lite.h
-    src/google/protobuf/stubs/atomicops.h
-    src/google/protobuf/stubs/atomicops_internals_x86_msvc.h
-    src/google/protobuf/stubs/platform_macros.h
-    src/google/protobuf/stubs/once.h
-    src/google/protobuf/compiler/parser.h
-    src/google/protobuf/io/printer.h
-    src/google/protobuf/reflection_ops.h
-    src/google/protobuf/repeated_field.h
-    src/google/protobuf/service.h
-    src/google/protobuf/stubs/stl_util.h
-    src/google/protobuf/stubs/stringprintf.h
-    src/google/protobuf/stubs/template_util.h
-    src/google/protobuf/stubs/type_traits.h
-    src/google/protobuf/stubs/strutil.h
-    src/google/protobuf/stubs/substitute.h
-    src/google/protobuf/text_format.h
-    src/google/protobuf/io/tokenizer.h
-    src/google/protobuf/unknown_field_set.h
-    src/google/protobuf/wire_format.h
-    src/google/protobuf/wire_format_lite.h
-    src/google/protobuf/wire_format_lite_inl.h
-    src/google/protobuf/io/zero_copy_stream.h
-    src/google/protobuf/io/zero_copy_stream_impl.h
-    src/google/protobuf/io/zero_copy_stream_impl_lite.h
+  SET (ATOMIC_INTERNALS
+       "src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc")
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+  SET (ATOMIC_INTERNALS
+       "src/google/protobuf/stubs/atomicops_internals_x86_gcc.cc")
+endif ()
+
+add_library(protobuf STATIC
+    "${ATOMIC_INTERNALS}"
     src/google/protobuf/io/coded_stream.cc
     src/google/protobuf/stubs/common.cc
     src/google/protobuf/descriptor.cc
@@ -73,7 +44,6 @@ if (MSVC)
     src/google/protobuf/message.cc
     src/google/protobuf/message_lite.cc
     src/google/protobuf/stubs/once.cc
-    src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc
     src/google/protobuf/compiler/parser.cc
     src/google/protobuf/io/printer.cc
     src/google/protobuf/reflection_ops.cc
@@ -92,92 +62,23 @@ if (MSVC)
     src/google/protobuf/io/zero_copy_stream_impl_lite.cc
     src/google/protobuf/stubs/stringprintf.cc
   )
-  
+
+install(TARGETS protobuf DESTINATION lib)
+
+if (MSVC)  
   set_property(
     TARGET libprotobuf
     PROPERTY COMPILE_DEFINITIONS _USRDLL LIBPROTOBUF_EXPORTS
   )
-  
-  add_library(libprotobuf-lite STATIC
-    src/google/protobuf/io/coded_stream.h
-    src/google/protobuf/io/coded_stream_inl.h
-    src/google/protobuf/stubs/common.h
-    vsprojects/config.h
-    src/google/protobuf/extension_set.h
-    src/google/protobuf/generated_message_util.h
-    src/google/protobuf/stubs/hash.h
-    src/google/protobuf/stubs/map_util.h
-    src/google/protobuf/message_lite.h
-    src/google/protobuf/stubs/once.h
-    src/google/protobuf/stubs/atomicops.h
-    src/google/protobuf/stubs/atomicops_internals_x86_msvc.h
-    src/google/protobuf/stubs/platform_macros.h
-    src/google/protobuf/repeated_field.h
-    src/google/protobuf/stubs/stl_util.h
-    src/google/protobuf/wire_format_lite.h
-    src/google/protobuf/wire_format_lite_inl.h
-    src/google/protobuf/io/zero_copy_stream_impl_lite.h
-    src/google/protobuf/stubs/stringprintf.h
-    src/google/protobuf/stubs/template_util.h
-    src/google/protobuf/stubs/type_traits.h
-    src/google/protobuf/io/coded_stream.cc
-    src/google/protobuf/stubs/common.cc
-    src/google/protobuf/extension_set.cc
-    src/google/protobuf/generated_message_util.cc
-    src/google/protobuf/message_lite.cc
-    src/google/protobuf/stubs/once.cc
-    src/google/protobuf/stubs/atomicops_internals_x86_msvc.cc
-    src/google/protobuf/repeated_field.cc
-    src/google/protobuf/wire_format_lite.cc
-    src/google/protobuf/io/zero_copy_stream.cc
-    src/google/protobuf/io/zero_copy_stream_impl_lite.cc
-    src/google/protobuf/stubs/stringprintf.cc
-  )
 
   set_property(
-    TARGET libprotobuf-lite
-    PROPERTY COMPILE_DEFINITIONS _USRDLL LIBPROTOBUF_EXPORTS
+    TARGET protoc
+    PROPERTY _CONSOLE
   )
-  
-  add_library(libprotoc STATIC
-    src/google/protobuf/compiler/code_generator.h
-    src/google/protobuf/compiler/command_line_interface.h
-    src/google/protobuf/compiler/subprocess.h
-    src/google/protobuf/compiler/zip_writer.h
-    src/google/protobuf/compiler/plugin.h
-    src/google/protobuf/compiler/plugin.pb.h
-    src/google/protobuf/compiler/cpp/cpp_enum.h
-    src/google/protobuf/compiler/cpp/cpp_enum_field.h
-    src/google/protobuf/compiler/cpp/cpp_extension.h
-    src/google/protobuf/compiler/cpp/cpp_field.h
-    src/google/protobuf/compiler/cpp/cpp_file.h
-    src/google/protobuf/compiler/cpp/cpp_generator.h
-    src/google/protobuf/compiler/cpp/cpp_helpers.h
-    src/google/protobuf/compiler/cpp/cpp_message.h
-    src/google/protobuf/compiler/cpp/cpp_message_field.h
-    src/google/protobuf/compiler/cpp/cpp_options.h
-    src/google/protobuf/compiler/cpp/cpp_primitive_field.h
-    src/google/protobuf/compiler/cpp/cpp_service.h
-    src/google/protobuf/compiler/cpp/cpp_string_field.h
-    src/google/protobuf/compiler/java/java_context.h
-    src/google/protobuf/compiler/java/java_enum.h
-    src/google/protobuf/compiler/java/java_enum_field.h
-    src/google/protobuf/compiler/java/java_extension.h
-    src/google/protobuf/compiler/java/java_field.h
-    src/google/protobuf/compiler/java/java_file.h
-    src/google/protobuf/compiler/java/java_generator.h
-    src/google/protobuf/compiler/java/java_generator_factory.h
-    src/google/protobuf/compiler/java/java_helpers.h
-    src/google/protobuf/compiler/java/java_lazy_message_field.h
-    src/google/protobuf/compiler/java/java_message.h
-    src/google/protobuf/compiler/java/java_message_field.h
-    src/google/protobuf/compiler/java/java_name_resolver.h
-    src/google/protobuf/compiler/java/java_primitive_field.h
-    src/google/protobuf/compiler/java/java_service.h
-    src/google/protobuf/compiler/java/java_shared_code_generator.h
-    src/google/protobuf/compiler/java/java_string_field.h
-    src/google/protobuf/compiler/java/java_doc_comment.h
-    src/google/protobuf/compiler/python/python_generator.h
+endif (MSVC)
+
+  add_executable(protoc
+    src/google/protobuf/compiler/main.cc
     src/google/protobuf/compiler/java/java_doc_comment.cc
     src/google/protobuf/compiler/code_generator.cc
     src/google/protobuf/compiler/command_line_interface.cc
@@ -216,24 +117,7 @@ if (MSVC)
     src/google/protobuf/compiler/java/java_string_field.cc
     src/google/protobuf/compiler/python/python_generator.cc
   )
-  
-  set_property(
-    TARGET libprotoc
-    PROPERTY COMPILE_DEFINITIONS _USRDLL LIBPROTOC_EXPORTS
-  )
-    
-  add_executable(protoc
-    src/google/protobuf/compiler/main.cc
-  )
    
-  set_property(
-    TARGET protoc
-    PROPERTY _CONSOLE
-  )
-  
   target_link_libraries(protoc
-    libprotobuf
-    libprotoc
+    protobuf
   )
-
-endif (MSVC)

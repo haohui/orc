@@ -23,7 +23,6 @@
 #include "RLE.hh"
 #include "TypeImpl.hh"
 #include "orc/Int128.hh"
-#include <google/protobuf/text_format.h>
 
 #include <algorithm>
 #include <iostream>
@@ -34,12 +33,6 @@
 #include <vector>
 
 namespace orc {
-
-  std::string printProtobufMessage(const google::protobuf::Message& message) {
-    std::string result;
-    google::protobuf::TextFormat::PrintToString(message, &result);
-    return result;
-  }
 
   struct ReaderOptionsPrivate {
     std::list<int> includedColumns;
@@ -810,7 +803,7 @@ namespace orc {
     }
 
     virtual const ColumnStatistics* getColumnStatistics(uint32_t columnId
-                                                        ) const {
+                                                        ) const override {
       std::list<ColumnStatistics*>::const_iterator it = colStats.begin();
       std::advance(it, static_cast<long>(columnId));
       return *it;

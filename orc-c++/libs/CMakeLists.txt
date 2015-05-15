@@ -10,13 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (MSVC)
-  if (NOT Protobuf_FOUND)
-    add_subdirectory(protobuf-${PROTOBUF_VERSION})
-  endif (NOT Protobuf_FOUND)
-  
-  if (NOT ZLIB_FOUND)
-    add_subdirectory(zlib-${ZLIB_VERSION})
-  endif (NOT ZLIB_FOUND)
-endif (MSVC)
 add_subdirectory(gmock-${GMOCK_VERSION})
+add_subdirectory(protobuf-${PROTOBUF_VERSION})
+add_subdirectory(snappy-${SNAPPY_VERSION})
+add_subdirectory(zlib-${ZLIB_VERSION})

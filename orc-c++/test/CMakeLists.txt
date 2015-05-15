@@ -17,9 +17,10 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIR}
   ${SNAPPY_INCLUDE_DIRS}
+  ${GMOCK_INCLUDE_DIRS}
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${CXX11_FLAGS} ${WARN_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
 
 add_executable (test-orc
   orc/TestByteRle.cc
@@ -34,7 +35,7 @@ add_executable (test-orc
 target_link_libraries (test-orc
   orc
   ${PROTOBUF_LIBRARIES}
-  ${GMOCK_LIB}
+  ${GMOCK_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${SNAPPY_LIBRARIES}
 )

@@ -18,25 +18,42 @@ project(ORC)
 SET(CPACK_PACKAGE_VERSION_MAJOR "1")
 SET(CPACK_PACKAGE_VERSION_MINOR "0")
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(ORC_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 
 # Set the package format
 SET(CPACK_GENERATOR "TGZ")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
-        "${CMAKE_SOURCE_DIR}/orc-c++/libs/cmake/Modules/")
-
 INCLUDE(CPack)
 
 set (GMOCK_VERSION "1.7.0")
-include_directories(
-  ${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/include
-  ${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/gtest/include
-  )
+set (GMOCK_INCLUDE_DIRS
+     "${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/include"
+     "${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/gtest/include"
+    )
+set (GMOCK_LIBRARIES gmock)
+if(NOT APPLE AND NOT MSVC)
+  list (APPEND GMOCK_LIBRARIES pthread)
+endif(NOT APPLE AND NOT MSVC)
+
+set (PROTOBUF_VERSION "2.6.0")
+set (PROTOBUF_INCLUDE_DIRS
+     "${CMAKE_SOURCE_DIR}/orc-c++/libs/protobuf-${PROTOBUF_VERSION}/src")
+set (PROTOBUF_LIBRARIES protobuf)
+
+set (SNAPPY_VERSION "1.1.2")
+set (SNAPPY_INCLUDE_DIRS
+     "${CMAKE_SOURCE_DIR}/orc-c++/libs/snappy-${SNAPPY_VERSION}")
+set (SNAPPY_LIBRARIES snappy)
+
+set (ZLIB_VERSION "1.2.8")
+set (ZLIB_INCLUDE_DIRS
+     "${CMAKE_SOURCE_DIR}/orc-c++/libs/zlib-${ZLIB_VERSION}"
+     "${CMAKE_BINARY_DIR}/orc-c++/libs/zlib-${ZLIB_VERSION}"
+    )
+set (ZLIB_LIBRARIES zlib)
 
 if (MSVC)
   set (GMOCK_LIB "${CMAKE_BINARY_DIR}/libs/gmock-${GMOCK_VERSION}/gmock_main")
-  set (PROTOBUF_VERSION "2.6.0")
-  set (ZLIB_VERSION "1.2.8")
   add_definitions (-D_SCL_SECURE_NO_WARNINGS)
   add_definitions (-D_CRT_SECURE_NO_WARNINGS)
   # TODO: We assume MSVC debug mode. In the future, set these flags
@@ -47,63 +64,11 @@ if (MSVC)
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcmt.lib")
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libcd.lib")
+
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrtd.lib")
   include_directories(${CMAKE_SOURCE_DIR}/os/win)
+endif (MSVC)
   
-  find_package (Protobuf)
-  
-  if (NOT Protobuf_FOUND)
-    include_directories(
-    ${CMAKE_SOURCE_DIR}/libs/protobuf-${PROTOBUF_VERSION}/include
-    )
-    set (PROTOBUF_PROTOC_EXECUTABLE ${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/protoc.exe)
-    set (PROTOBUF_LITE_LIBRARIES "${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf-lite.lib")
-    set (PROTOBUF_LIBRARIES "${CMAKE_BINARY_DIR}/libs/protobuf-${PROTOBUF_VERSION}/${CMAKE_CFG_INTDIR}/libprotobuf.lib")
-    message (STATUS "PROTOBUF_LIBRARIES = ${PROTOBUF_LIBRARIES}")
-    message (STATUS "PROTOBUF_LITE_LIBRARIES = ${PROTOBUF_LITE_LIBRARIES}")
-    message (STATUS "PROTOBUF_LIBRARY = ${PROTOBUF_LIBRARY}")
-    message (STATUS "PROTOBUF_LITE_LIBRARY = ${PROTOBUF_LITE_LIBRARY}")
-  endif (NOT Protobuf_FOUND)
-  
-  find_package(ZLIB)
-  
-  if (NOT ZLIB_FOUND)
-    set (ZLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs/zlib-${ZLIB_VERSION}/include)
-    include_directories(${ZLIB_INCLUDE_DIR})
-    set (ZLIB_LIBRARIES "${CMAKE_BINARY_DIR}/libs/zlib-${ZLIB_VERSION}/${CMAKE_CFG_INTDIR}/zlibstaticd.lib")
-    message (STATUS "ZLIB_INCLUDE_DIR = ${ZLIB_INCLUDE_DIR}")
-    message (STATUS "ZLIB_LIBRARIES = ${ZLIB_LIBRARIES}")
-  endif (NOT ZLIB_FOUND)
-  
-else(MSVC)
-  set (GMOCK_LIB
-     "${CMAKE_BINARY_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/libgmock_main.a")
-
-  find_package (Protobuf REQUIRED)
-  MESSAGE( STATUS "PROTOBUF_INCLUDE_DIR:       " ${PROTOBUF_INCLUDE_DIR} )
-  MESSAGE( STATUS "PROTOBUF_LITE_LIBRARIES:    " ${PROTOBUF_LITE_LIBRARIES} )
-  MESSAGE( STATUS "PROTOBUF_LIBRARIES:         " ${PROTOBUF_LIBRARIES} )
-  MESSAGE( STATUS "PROTOBUF_PROTOC_EXECUTABLE: " ${PROTOBUF_PROTOC_EXECUTABLE} )
-  MESSAGE( STATUS "PROTOBUF_LIBRARY:           " ${PROTOBUF_LIBRARY} )
-  MESSAGE( STATUS "PROTOBUF_LITE_LIBRARY:      " ${PROTOBUF_LITE_LIBRARY} )
-
-  find_package(ZLIB REQUIRED)
-  MESSAGE( STATUS "ZLIB_INCLUDE_DIR:           " ${ZLIB_INCLUDE_DIR} )
-  MESSAGE( STATUS "ZLIB_LIBRARY:               " ${ZLIB_LIBRARY} )
-  MESSAGE( STATUS "ZLIB_INCLUDE_DIRS:          " ${ZLIB_INCLUDE_DIR} )
-  MESSAGE( STATUS "ZLIB_LIBRARIES:             " ${ZLIB_LIBRARIES} )
-
-  find_package(Snappy REQUIRED)
-  MESSAGE( STATUS "SNAPPY_ROOT_DIR:            " ${SNAPPY_ROOT_DIR} )
-  MESSAGE( STATUS "SNAPPY_LIBRARY:             " ${SNAPPY_LIBRARY} )
-  MESSAGE( STATUS "SNAPPY_INCLUDE_DIR:         " ${SNAPPY_INCLUDE_DIR} )
-  MESSAGE( STATUS "SNAPPY_LIBRARIES:           " ${SNAPPY_LIBRARIES} )
-  MESSAGE( STATUS "SNAPPY_INCLUDE_DIRS:        " ${SNAPPY_INCLUDE_DIRS} )
-endif(MSVC)
-
-if(NOT APPLE AND NOT MSVC)
-  list (APPEND GMOCK_LIB pthread)
-endif(NOT APPLE AND NOT MSVC)
 enable_testing()
 
 if(NOT C09 AND NOT MSVC)
@@ -117,13 +82,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set (WARN_FLAGS "-Weverything -Wno-c++98-compat -Wno-missing-prototypes")
   set (WARN_FLAGS "${WARN_FLAGS} -Wno-c++98-compat-pedantic -Wno-padded")
   set (WARN_FLAGS "${WARN_FLAGS} -Wno-covered-switch-default")
-  set (WARN_FLAGS "${WARN_FLAGS} -Wno-missing-noreturn -Werror")
+  set (WARN_FLAGS "${WARN_FLAGS} -Wno-missing-noreturn -Wno-unknown-pragmas")
+  set (WARN_FLATS "${WARN_FLAGS} -Werror")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set (WARN_FLAGS "-Wall -Werror")
 endif ()
 
 if (NOT MSVC)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O2")
 endif (NOT MSVC)
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COVERAGE_FLAGS}")
 

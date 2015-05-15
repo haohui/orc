@@ -13,20 +13,22 @@
  */
 
 #ifdef __clang__
-  #pragma clang diagnostic ignored "-Wpadded"
-  #pragma clang diagnostic ignored "-Wsign-conversion"
-  #pragma clang diagnostic ignored "-Wsign-compare"
-  #pragma clang diagnostic ignored "-Wweak-vtables"
-  #pragma clang diagnostic ignored "-Wshorten-64-to-32"
-  #pragma clang diagnostic ignored "-Wglobal-constructors"
-  #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
-  #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
-  #pragma clang diagnostic ignored "-Wdeprecated"
   #pragma clang diagnostic ignored "-Wconversion"
-  #pragma clang diagnostic ignored "-Wunused-parameter"
+  #pragma clang diagnostic ignored "-Wdeprecated"
+  #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+  #pragma clang diagnostic ignored "-Wglobal-constructors"
+  #pragma clang diagnostic ignored "-Wignored-qualifiers"
+  #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
   #pragma clang diagnostic ignored "-Wnested-anon-types"
+  #pragma clang diagnostic ignored "-Wpadded"
+  #pragma clang diagnostic ignored "-Wreserved-id-macro"
+  #pragma clang diagnostic ignored "-Wshorten-64-to-32"
   #pragma clang diagnostic ignored "-Wsign-compare"
+  #pragma clang diagnostic ignored "-Wsign-conversion"
+  #pragma clang diagnostic ignored "-Wunused-parameter"
+  #pragma clang diagnostic ignored "-Wweak-vtables"
 #else
+  #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
 #include "orc_proto.pb.cc"

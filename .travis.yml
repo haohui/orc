@@ -6,9 +6,6 @@ before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq update
   - sudo apt-get -qq install g++-4.8
-  - sudo apt-get -qq install libprotobuf-dev
-  - sudo apt-get -qq install protobuf-compiler
-  - sudo apt-get -qq install libsnappy-dev
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
 before_script:

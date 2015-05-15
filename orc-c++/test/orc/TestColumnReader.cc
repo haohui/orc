@@ -26,6 +26,10 @@
 #include <iostream>
 #include <vector>
 
+#ifdef __clang__
+  #pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#endif
+
 namespace orc {
 
 class MockStripeStreams: public StripeStreams {

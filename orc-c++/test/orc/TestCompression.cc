@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "zlib.h"
-#include "snappy.h"
+#include "wrap/snappy-wrapper.h"
 
 namespace orc {
 

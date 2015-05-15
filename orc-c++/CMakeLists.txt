@@ -28,7 +28,7 @@ install(FILES
   "include/orc/OrcFile.hh"
   "include/orc/Reader.hh"
   "include/orc/Vector.hh"
-  DESTINATION "include"
+  DESTINATION "include/orc"
   )
 
 add_subdirectory(libs)

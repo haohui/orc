@@ -17,9 +17,10 @@ include_directories(
   ${PROJECT_BINARY_DIR}/orc-c++/include
   ${PROJECT_BINARY_DIR}/orc-c++/src
   ${PROTOBUF_INCLUDE_DIRS}
+  ${GMOCK_INCLUDE_DIRS}
 )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${CXX11_FLAGS} ${WARN_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
 
 add_executable (tool-test
   gzip.cc
@@ -30,7 +31,7 @@ add_executable (tool-test
 target_link_libraries (tool-test
   orc
   ${PROTOBUF_LIBRARIES}
-  ${GMOCK_LIB}
+  ${GMOCK_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${SNAPPY_LIBRARIES}
 )

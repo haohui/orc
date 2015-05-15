@@ -18,9 +18,16 @@ include_directories (
   ${SNAPPY_INCLUDE_DIRS}
   )
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ../../proto/orc_proto.proto)
+add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
+   COMMAND mkdir "${CMAKE_BINARY_DIR}/orc-java" &&
+     ${CMAKE_BINARY_DIR}/orc-c++/libs/protobuf-${PROTOBUF_VERSION}/protoc
+        -I ${CMAKE_SOURCE_DIR}/proto
+        --cpp_out="${CMAKE_CURRENT_BINARY_DIR}"
+        --java_out="${CMAKE_BINARY_DIR}/orc-java"
+        "${CMAKE_SOURCE_DIR}/proto/orc_proto.proto"
+)
 
-set (CMAKE_CXX_FLAGS "-O0 ${CMAKE_CXX_FLAGS} -g ${CXX11_FLAGS} ${WARN_FLAGS}")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
 
 if (C09)
   set (ADAOPTOR_CLASS "orc/C09Adapter.cc")
@@ -28,7 +35,7 @@ endif (C09)
 
 add_library (orc STATIC
   ${ADAPTOR_CLASS}
-  ${PROTO_HDRS}
+  orc_proto.pb.h
   wrap/orc-proto-wrapper.cc
   orc/ByteRLE.cc
   orc/ColumnPrinter.cc
@@ -53,7 +60,7 @@ if (MSVC)
 endif (MSVC)
 
 target_link_libraries (orc
-  ${PROTOBUF_LITE_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${SNAPPY_LIBRARIES}
   )

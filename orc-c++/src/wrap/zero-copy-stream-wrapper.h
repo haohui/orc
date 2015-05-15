@@ -17,8 +17,9 @@
 
 #ifdef __clang__
   #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wpadded"
   #pragma clang diagnostic ignored "-Wdeprecated"
+  #pragma clang diagnostic ignored "-Wpadded"
+  #pragma clang diagnostic ignored "-Wreserved-id-macro"
   #pragma clang diagnostic ignored "-Wunused-parameter"
 #else
 #endif
