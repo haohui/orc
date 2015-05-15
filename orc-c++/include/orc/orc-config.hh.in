@@ -15,11 +15,7 @@
 #ifndef ORC_CONFIG_HH
 #define ORC_CONFIG_HH
 
-#define ORC_VERSION "@ORC_VERSION@"
-
-namespace orc {
-  using uint64 = unsigned long;
-  using int64 = signed long;
-}
+#define ORC_VERSION "@CPACK_PACKAGE_VERSION_MAJOR@."\
+"@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@"
 
 #endif

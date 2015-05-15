@@ -13,10 +13,14 @@
 cmake_minimum_required (VERSION 2.6)
 
 project(ORC)
-set (ORC_VERSION "1.0.0")
+SET(CPACK_PACKAGE_VERSION_MAJOR "1")
+SET(CPACK_PACKAGE_VERSION_MINOR "0")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
         "${CMAKE_SOURCE_DIR}/orc-c++/libs/cmake/Modules/")
+
+INCLUDE(CPack)
 
 set (GMOCK_VERSION "1.7.0")
 include_directories(

@@ -46,6 +46,8 @@ add_library (orc STATIC
   orc/Vector.cc
   )
 
+install(TARGETS orc DESTINATION lib)
+
 if (MSVC)
   add_dependencies (orc libprotobuf libprotobuf-lite protoc zlib zlibstatic)
 endif (MSVC)

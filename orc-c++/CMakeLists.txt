@@ -19,6 +19,18 @@ include_directories (
   "include"
   )
 
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/include/orc/orc-config.hh"
+  "include/orc/C09Adapter.hh"
+  "include/orc/ColumnPrinter.hh"
+  "include/orc/Int128.hh"
+  "include/orc/MemoryPool.hh"
+  "include/orc/OrcFile.hh"
+  "include/orc/Reader.hh"
+  "include/orc/Vector.hh"
+  DESTINATION "include"
+  )
+
 add_subdirectory(libs)
 add_subdirectory(src)
 add_subdirectory(test)
