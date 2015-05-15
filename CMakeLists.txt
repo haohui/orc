@@ -13,9 +13,14 @@
 cmake_minimum_required (VERSION 2.6)
 
 project(ORC)
+
+# Version number of package
 SET(CPACK_PACKAGE_VERSION_MAJOR "1")
 SET(CPACK_PACKAGE_VERSION_MINOR "0")
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
+
+# Set the package format
+SET(CPACK_GENERATOR "TGZ")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
         "${CMAKE_SOURCE_DIR}/orc-c++/libs/cmake/Modules/")
