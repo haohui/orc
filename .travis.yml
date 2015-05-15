@@ -16,4 +16,6 @@ before_script:
   - cd build
   - cmake ..
   - make
-script: env TZ=America/Los_Angeles orc-c++/test/test-orc && tools-c++/test/tool-test
+script:
+  - env TZ=America/Los_Angeles orc-c++/test/test-orc
+  - env TZ=America/Los_Angeles tools-c++/test/tool-test
