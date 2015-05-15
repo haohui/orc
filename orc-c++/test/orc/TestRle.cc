@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "Compression.hh"
-#include "RLE.hh"
+#include "orc/Compression.hh"
+#include "orc/RLE.hh"
 #include "wrap/gtest-wrapper.h"
 
 #include <iostream>

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "ColumnPrinter.hh"
-#include "Exceptions.hh"
+#include "orc/ColumnPrinter.hh"
+#include "orc/Exceptions.hh"
 
 #include <string>
 #include <memory>

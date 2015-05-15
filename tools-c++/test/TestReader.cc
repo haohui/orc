@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-#include "ColumnPrinter.hh"
 #include "gzip.hh"
+#include "orc/ColumnPrinter.hh"
 #include "orc/OrcFile.hh"
-#include "TestDriver.hh"
+#include "ToolTest.hh"
 
 #include "wrap/gmock.h"
 #include "wrap/gtest-wrapper.h"
@@ -93,7 +93,7 @@ namespace orc {
 
     std::string getJsonFilename() {
       std::ostringstream filename;
-      filename << exampleDirectory << "/" << GetParam().json;
+      filename << exampleDirectory << "/expected/" << GetParam().json;
       return filename.str();
     }
   };

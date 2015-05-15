@@ -18,25 +18,15 @@
 
 
 #include "orc/orc-config.hh"
-#include "TestDriver.hh"
 
 #include "wrap/orc-proto-wrapper.hh"
 #include "wrap/gtest-wrapper.h"
 
-
 #include <iostream>
-
-const char *exampleDirectory = 0;
 
 GTEST_API_ int main(int argc, char **argv) {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
   std::cout << "ORC version: " << ORC_VERSION << "\n";
-  if (argc == 2) {
-    exampleDirectory = argv[1];
-  } else {
-    exampleDirectory = "../examples";
-  }
-  std::cout << "example dir = " << exampleDirectory << "\n";
   testing::InitGoogleTest(&argc, argv);
   int result = RUN_ALL_TESTS();
   return result;

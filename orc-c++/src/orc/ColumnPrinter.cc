@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "ColumnPrinter.hh"
+#include "orc/ColumnPrinter.hh"
 
 #include <limits>
 #include <sstream>

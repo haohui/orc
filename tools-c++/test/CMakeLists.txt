@@ -11,28 +11,23 @@
 # limitations under the License.
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_BINARY_DIR}/src
+  ${PROJECT_SOURCE_DIR}/orc-c++/include
+  ${PROJECT_SOURCE_DIR}/orc-c++/src
+  ${PROJECT_SOURCE_DIR}/tools-c++/src
+  ${PROJECT_BINARY_DIR}/orc-c++/include
+  ${PROJECT_BINARY_DIR}/orc-c++/src
   ${PROTOBUF_INCLUDE_DIRS}
-  ${ZLIB_INCLUDE_DIR}
-  ${SNAPPY_INCLUDE_DIRS}
 )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g ${CXX11_FLAGS} ${WARN_FLAGS}")
 
-add_executable (test-orc
+add_executable (tool-test
   gzip.cc
-  TestByteRle.cc
-  TestColumnPrinter.cc
-  TestColumnReader.cc
-  TestCompression.cc
-  TestDriver.cc
-  TestInt128.cc
   TestReader.cc
-  TestRle.cc
+  ToolTest.cc
 )
 
-target_link_libraries (test-orc
+target_link_libraries (tool-test
   orc
   ${PROTOBUF_LIBRARIES}
   ${GMOCK_LIB}
@@ -40,14 +35,4 @@ target_link_libraries (test-orc
   ${SNAPPY_LIBRARIES}
 )
 
-add_test (test-orc test-orc ${EXAMPLE_DIRECTORY})
-
-# Add another target called test-out that prints the results on failure
-if (CMAKE_CONFIGURATION_TYPES)
-  add_custom_target (test-out COMMAND ${CMAKE_CTEST_COMMAND}
-    --force-new-ctest-process --output-on-failure
-    --build-config "$<CONFIGURATION>")
-else (CMAKE_CONFIGURATION_TYPES)
-  add_custom_target (test-out COMMAND ${CMAKE_CTEST_COMMAND}
-    --force-new-ctest-process --output-on-failure)
-endif (CMAKE_CONFIGURATION_TYPES)
+add_test (tool-test tool-test ${EXAMPLE_DIRECTORY})

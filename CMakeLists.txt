@@ -15,12 +15,13 @@ cmake_minimum_required (VERSION 2.6)
 project(ORC)
 set (ORC_VERSION "1.0.0")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} 
+        "${CMAKE_SOURCE_DIR}/orc-c++/libs/cmake/Modules/")
 
 set (GMOCK_VERSION "1.7.0")
 include_directories(
-  ${CMAKE_SOURCE_DIR}/libs/gmock-${GMOCK_VERSION}/include
-  ${CMAKE_SOURCE_DIR}/libs/gmock-${GMOCK_VERSION}/gtest/include
+  ${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/include
+  ${CMAKE_SOURCE_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/gtest/include
   )
 
 if (MSVC)
@@ -66,7 +67,8 @@ if (MSVC)
   endif (NOT ZLIB_FOUND)
   
 else(MSVC)
-  set (GMOCK_LIB "${CMAKE_BINARY_DIR}/libs/gmock-${GMOCK_VERSION}/libgmock_main.a")
+  set (GMOCK_LIB
+     "${CMAKE_BINARY_DIR}/orc-c++/libs/gmock-${GMOCK_VERSION}/libgmock_main.a")
 
   find_package (Protobuf REQUIRED)
   MESSAGE( STATUS "PROTOBUF_INCLUDE_DIR:       " ${PROTOBUF_INCLUDE_DIR} )
@@ -118,8 +120,15 @@ endif (NOT MSVC)
 
 set (EXAMPLE_DIRECTORY ${CMAKE_SOURCE_DIR}/examples)
 
-add_subdirectory(libs)
-add_subdirectory(src)
-if(NOT C09)
-  add_subdirectory(test)
-endif(NOT C09)
+add_subdirectory(orc-c++)
+add_subdirectory(tools-c++)
+
+# Add another target called test-out that prints the results on failure
+if (CMAKE_CONFIGURATION_TYPES)
+  add_custom_target (test-out COMMAND ${CMAKE_CTEST_COMMAND}
+    --force-new-ctest-process --output-on-failure
+    --build-config "$<CONFIGURATION>")
+else (CMAKE_CONFIGURATION_TYPES)
+  add_custom_target (test-out COMMAND ${CMAKE_CTEST_COMMAND}
+    --force-new-ctest-process --output-on-failure)
+endif (CMAKE_CONFIGURATION_TYPES)

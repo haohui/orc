@@ -10,44 +10,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-configure_file (
-  "orc/orc-config.hh.in"
-  "orc/orc-config.hh"
-  )
-
 include_directories (
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${PROTOBUF_INCLUDE_DIRS}
   ${ZLIB_INCLUDE_DIRS}
   ${SNAPPY_INCLUDE_DIRS}
   )
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS orc_proto.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ../../proto/orc_proto.proto)
 
 set (CMAKE_CXX_FLAGS "-O0 ${CMAKE_CXX_FLAGS} -g ${CXX11_FLAGS} ${WARN_FLAGS}")
 
 if (C09)
-  set (ADAOPTOR_CLASS "C09Adapter.cc")
+  set (ADAOPTOR_CLASS "orc/C09Adapter.cc")
 endif (C09)
 
 add_library (orc STATIC
+  ${ADAPTOR_CLASS}
   ${PROTO_HDRS}
   wrap/orc-proto-wrapper.cc
-  ByteRLE.cc
-  ${ADAPTOR_CLASS}
-  ColumnReader.cc
-  Compression.cc
-  Exceptions.cc
-  Int128.cc
-  MemoryPool.cc
-  OrcFile.cc
-  Reader.cc
-  RLEv1.cc
-  RLEv2.cc
-  RLE.cc
-  TypeImpl.cc
-  Vector.cc
-  ColumnPrinter.cc
+  orc/ByteRLE.cc
+  orc/ColumnPrinter.cc
+  orc/ColumnReader.cc
+  orc/Compression.cc
+  orc/Exceptions.cc
+  orc/Int128.cc
+  orc/MemoryPool.cc
+  orc/OrcFile.cc
+  orc/Reader.cc
+  orc/RLEv1.cc
+  orc/RLEv2.cc
+  orc/RLE.cc
+  orc/TypeImpl.cc
+  orc/Vector.cc
   )
 
 if (MSVC)
@@ -60,38 +56,3 @@ target_link_libraries (orc
   ${SNAPPY_LIBRARIES}
   )
 
-add_executable (file-contents
-  FileContents.cc
-  )
-
-target_link_libraries (file-contents
-  orc
-  ${PROTOBUF_LIBRARIES}
-  )
-
-add_executable (file-scan
-  FileScan.cc
-  )
-
-target_link_libraries (file-scan
-  orc
-  ${PROTOBUF_LIBRARIES}
-  )
-
-add_executable (file-metadata
-  FileMetadata.cc
-  )
-
-target_link_libraries (file-metadata
-  orc
-  ${PROTOBUF_LIBRARIES}
-  )
-  
- add_executable (file-statistics
-  FileStatistics.cc
-  )
-
-target_link_libraries (file-statistics
-  orc
-  ${PROTOBUF_LIBRARIES}
-  ) 

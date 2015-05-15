@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-#include "Compression.hh"
-#include "Exceptions.hh"
+#include "orc/Compression.hh"
+#include "orc/Exceptions.hh"
 #include "wrap/gtest-wrapper.h"
-#include "TestDriver.hh"
 
 #include <cstdio>
 #include <fstream>

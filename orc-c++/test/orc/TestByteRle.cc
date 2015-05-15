@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "ByteRLE.hh"
+#include "orc/ByteRLE.hh"
 #include "wrap/gtest-wrapper.h"
 
 #include <iostream>

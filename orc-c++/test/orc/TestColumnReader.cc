@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "ColumnReader.hh"
-#include "Exceptions.hh"
+#include "orc/ColumnReader.hh"
+#include "orc/Exceptions.hh"
 
 #include "wrap/orc-proto-wrapper.hh"
 #include "wrap/gtest-wrapper.h"
