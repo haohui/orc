@@ -85,7 +85,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set (WARN_FLAGS "${WARN_FLAGS} -Wno-missing-noreturn -Wno-unknown-pragmas")
   set (WARN_FLATS "${WARN_FLAGS} -Werror")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set (WARN_FLAGS "-Wall -Werror")
+  set (WARN_FLAGS "-Wall -Wno-unknown-pragmas -Werror")
 endif ()
 
 if (NOT MSVC)
