@@ -11,6 +11,6 @@
 # limitations under the License.
 
 add_subdirectory(gmock-${GMOCK_VERSION})
+add_subdirectory(zlib-${ZLIB_VERSION})
 add_subdirectory(protobuf-${PROTOBUF_VERSION})
 add_subdirectory(snappy-${SNAPPY_VERSION})
-add_subdirectory(zlib-${ZLIB_VERSION})

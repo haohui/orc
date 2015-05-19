@@ -16,7 +16,8 @@ CONFIGURE_FILE(config.h.cmake config.h)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
                     ${CMAKE_CURRENT_SOURCE_DIR}
-		    ${CMAKE_CURRENT_BINARY_DIR})
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    ${ZLIB_INCLUDE_DIRS})
 
 if (MSVC)
   SET (ATOMIC_INTERNALS
