@@ -134,7 +134,10 @@ namespace orc {
     size_t posn = static_cast<size_t>(ftell(outputFile));
     rewind(outputFile);
     char *buffer = new char[posn];
-    fread(buffer, 1, posn, outputFile);
+    size_t sizeRead = fread(buffer, 1, posn, outputFile);
+    if (sizeRead != posn) {
+      throw std::runtime_error("Bad read");
+    }
     rewind(outputFile);
     return std::string(buffer, posn);
   }
