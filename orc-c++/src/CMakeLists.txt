@@ -55,10 +55,6 @@ add_library (orc STATIC
 
 install(TARGETS orc DESTINATION lib)
 
-if (MSVC)
-  add_dependencies (orc libprotobuf libprotobuf-lite protoc zlib zlibstatic)
-endif (MSVC)
-
 target_link_libraries (orc
   ${PROTOBUF_LIBRARIES}
   ${ZLIB_LIBRARIES}

@@ -66,19 +66,7 @@ add_library(protobuf STATIC
 
 install(TARGETS protobuf DESTINATION lib)
 
-if (MSVC)  
-  set_property(
-    TARGET libprotobuf
-    PROPERTY COMPILE_DEFINITIONS _USRDLL LIBPROTOBUF_EXPORTS
-  )
-
-  set_property(
-    TARGET protoc
-    PROPERTY _CONSOLE
-  )
-endif (MSVC)
-
-  add_executable(protoc
+add_executable(protoc
     src/google/protobuf/compiler/main.cc
     src/google/protobuf/compiler/java/java_doc_comment.cc
     src/google/protobuf/compiler/code_generator.cc
