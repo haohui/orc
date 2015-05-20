@@ -61,3 +61,4 @@ target_link_libraries (orc
   ${SNAPPY_LIBRARIES}
   )
 
+add_dependencies(orc protoc)
