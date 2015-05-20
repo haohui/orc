@@ -39,7 +39,7 @@ namespace orc {
   public:
     ColumnPrinter(std::string&, const Type&);
     virtual ~ColumnPrinter();
-    virtual void printRow(unsigned long rowId) = 0;
+    virtual void printRow(uint64_t rowId) = 0;
     // should be called once at the start of each batch of rows
     virtual void reset(const ColumnVectorBatch& batch);
   };

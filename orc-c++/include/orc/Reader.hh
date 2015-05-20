@@ -343,37 +343,37 @@ namespace orc {
      * Get the byte offset of the start of the stripe.
      * @return the bytes from the start of the file
      */
-    virtual unsigned long getOffset() const = 0;
+    virtual uint64_t getOffset() const = 0;
 
     /**
      * Get the total length of the stripe in bytes.
      * @return the number of bytes in the stripe
      */
-    virtual unsigned long getLength() const = 0;
+    virtual uint64_t getLength() const = 0;
 
     /**
      * Get the length of the stripe's indexes.
      * @return the number of bytes in the index
      */
-    virtual unsigned long getIndexLength() const = 0;
+    virtual uint64_t getIndexLength() const = 0;
 
     /**
      * Get the length of the stripe's data.
      * @return the number of bytes in the stripe
      */
-    virtual unsigned long getDataLength()const = 0;
+    virtual uint64_t getDataLength()const = 0;
 
     /**
      * Get the length of the stripe's tail section, which contains its index.
      * @return the number of bytes in the tail
      */
-    virtual unsigned long getFooterLength() const = 0;
+    virtual uint64_t getFooterLength() const = 0;
 
     /**
      * Get the number of rows in the stripe.
      * @return a count of the number of rows
      */
-    virtual unsigned long getNumberOfRows() const = 0;
+    virtual uint64_t getNumberOfRows() const = 0;
   };
 
   class Statistics {
@@ -433,7 +433,7 @@ namespace orc {
      * @param length the number of bytes to read
      * @return this
      */
-    ReaderOptions& range(unsigned long offset, unsigned long length);
+    ReaderOptions& range(uint64_t offset, uint64_t length);
 
     /**
      * For Hive 0.11 (and 0.12) decimals, the precision was unlimited
@@ -466,7 +466,7 @@ namespace orc {
      * Set the location of the tail as defined by the logical length of the
      * file.
      */
-    ReaderOptions& setTailLocation(unsigned long offset);
+    ReaderOptions& setTailLocation(uint64_t offset);
 
     /**
      * Set the stream to use for printing warning or error messages.
@@ -488,19 +488,19 @@ namespace orc {
      * Get the start of the range for the data being processed.
      * @return if not set, return 0
      */
-    unsigned long getOffset() const;
+    uint64_t getOffset() const;
 
     /**
      * Get the end of the range for the data being processed.
      * @return if not set, return the maximum long
      */
-    unsigned long getLength() const;
+    uint64_t getLength() const;
 
     /**
      * Get the desired tail location.
      * @return if not set, return the maximum long.
      */
-    unsigned long getTailLocation() const;
+    uint64_t getTailLocation() const;
 
     /**
      * Should the reader throw a ParseError when a Hive 0.11 decimal is
@@ -544,7 +544,7 @@ namespace orc {
      * Get the number of rows in the file.
      * @return the number of rows
      */
-    virtual unsigned long getNumberOfRows() const = 0;
+    virtual uint64_t getNumberOfRows() const = 0;
 
     /**
      * Get the user metadata keys.
@@ -576,20 +576,20 @@ namespace orc {
      * Get the buffer size for the compression.
      * @return number of bytes to buffer for the compression codec.
      */
-    virtual unsigned long getCompressionSize() const = 0;
+    virtual uint64_t getCompressionSize() const = 0;
 
     /**
      * Get the number of rows per a entry in the row index.
      * @return the number of rows per an entry in the row index or 0 if there
      * is no row index.
      */
-    virtual unsigned long getRowIndexStride() const = 0;
+    virtual uint64_t getRowIndexStride() const = 0;
 
     /**
      * Get the number of stripes in the file.
      * @return the number of stripes
      */
-    virtual unsigned long getNumberOfStripes() const = 0;
+    virtual uint64_t getNumberOfStripes() const = 0;
 
     /**
      * Get the information about a stripe.
@@ -597,13 +597,13 @@ namespace orc {
      * @return the information about that stripe
      */
     virtual std::unique_ptr<StripeInformation>
-    getStripe(unsigned long stripeIndex) const = 0;
+    getStripe(uint64_t stripeIndex) const = 0;
 
     /**
      * Get the number of stripe statistics in the file.
      * @return the number of stripe statistics
      */
-    virtual unsigned long getNumberOfStripeStatistics() const = 0;
+    virtual uint64_t getNumberOfStripeStatistics() const = 0;
 
     /**
      * Get the statistics about a stripe.
@@ -611,13 +611,13 @@ namespace orc {
      * @return the statistics about that stripe
      */
     virtual std::unique_ptr<Statistics>
-    getStripeStatistics(unsigned long stripeIndex) const = 0;
+    getStripeStatistics(uint64_t stripeIndex) const = 0;
 
     /**
      * Get the length of the file.
      * @return the number of bytes in the file
      */
-    virtual unsigned long getContentLength() const = 0;
+    virtual uint64_t getContentLength() const = 0;
 
     /**
      * Get the statistics about the columns in the file.
@@ -649,7 +649,7 @@ namespace orc {
      * @return a new ColumnVectorBatch to read into
      */
     virtual std::unique_ptr<ColumnVectorBatch> createRowBatch
-    (unsigned long size) const = 0;
+    (uint64_t size) const = 0;
 
     /**
      * Read the next row batch from the current position.
@@ -665,13 +665,13 @@ namespace orc {
      * Get the row number of the first row in the previously read batch.
      * @return the row number of the previous batch.
      */
-    virtual unsigned long getRowNumber() const = 0;
+    virtual uint64_t getRowNumber() const = 0;
 
     /**
      * Seek to a given row.
      * @param rowNumber the next row the reader should return
      */
-    virtual void seekToRow(unsigned long rowNumber) = 0;
+    virtual void seekToRow(uint64_t rowNumber) = 0;
 
     /**
      * Get the name of the input stream.

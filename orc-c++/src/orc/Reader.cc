@@ -36,9 +36,9 @@ namespace orc {
 
   struct ReaderOptionsPrivate {
     std::list<int> includedColumns;
-    unsigned long dataStart;
-    unsigned long dataLength;
-    unsigned long tailLocation;
+    uint64_t dataStart;
+    uint64_t dataLength;
+    uint64_t tailLocation;
     bool throwOnHive11DecimalOverflow;
     int32_t forcedScaleOnHive11Decimal;
     std::ostream* errorStream;
@@ -47,8 +47,8 @@ namespace orc {
     ReaderOptionsPrivate() {
       includedColumns.assign(1,0);
       dataStart = 0;
-      dataLength = std::numeric_limits<unsigned long>::max();
-      tailLocation = std::numeric_limits<unsigned long>::max();
+      dataLength = std::numeric_limits<uint64_t>::max();
+      tailLocation = std::numeric_limits<uint64_t>::max();
       throwOnHive11DecimalOverflow = true;
       forcedScaleOnHive11Decimal = 6;
       errorStream = &std::cerr;
@@ -96,14 +96,14 @@ namespace orc {
     return *this;
   }
 
-  ReaderOptions& ReaderOptions::range(unsigned long offset,
-                                      unsigned long length) {
+  ReaderOptions& ReaderOptions::range(uint64_t offset,
+                                      uint64_t length) {
     privateBits->dataStart = offset;
     privateBits->dataLength = length;
     return *this;
   }
 
-  ReaderOptions& ReaderOptions::setTailLocation(unsigned long offset) {
+  ReaderOptions& ReaderOptions::setTailLocation(uint64_t offset) {
     privateBits->tailLocation = offset;
     return *this;
   }
@@ -121,15 +121,15 @@ namespace orc {
     return privateBits->includedColumns;
   }
 
-  unsigned long ReaderOptions::getOffset() const {
+  uint64_t ReaderOptions::getOffset() const {
     return privateBits->dataStart;
   }
 
-  unsigned long ReaderOptions::getLength() const {
+  uint64_t ReaderOptions::getLength() const {
     return privateBits->dataLength;
   }
 
-  unsigned long ReaderOptions::getTailLocation() const {
+  uint64_t ReaderOptions::getTailLocation() const {
     return privateBits->tailLocation;
   }
 
@@ -707,19 +707,19 @@ namespace orc {
   };
 
   class StripeInformationImpl : public StripeInformation {
-    unsigned long offset;
-    unsigned long indexLength;
-    unsigned long dataLength;
-    unsigned long footerLength;
-    unsigned long numRows;
+    uint64_t offset;
+    uint64_t indexLength;
+    uint64_t dataLength;
+    uint64_t footerLength;
+    uint64_t numRows;
 
   public:
 
-    StripeInformationImpl(unsigned long _offset,
-                          unsigned long _indexLength,
-                          unsigned long _dataLength,
-                          unsigned long _footerLength,
-                          unsigned long _numRows) :
+    StripeInformationImpl(uint64_t _offset,
+                          uint64_t _indexLength,
+                          uint64_t _dataLength,
+                          uint64_t _footerLength,
+                          uint64_t _numRows) :
       offset(_offset),
       indexLength(_indexLength),
       dataLength(_dataLength),
@@ -729,26 +729,26 @@ namespace orc {
 
     virtual ~StripeInformationImpl();
 
-    unsigned long getOffset() const override {
+    uint64_t getOffset() const override {
       return offset;
     }
 
-    unsigned long getLength() const override {
+    uint64_t getLength() const override {
       return indexLength + dataLength + footerLength;
     }
-    unsigned long getIndexLength() const override {
+    uint64_t getIndexLength() const override {
       return indexLength;
     }
 
-    unsigned long getDataLength()const override {
+    uint64_t getDataLength()const override {
       return dataLength;
     }
 
-    unsigned long getFooterLength() const override {
+    uint64_t getFooterLength() const override {
       return footerLength;
     }
 
-    unsigned long getNumberOfRows() const override {
+    uint64_t getNumberOfRows() const override {
       return numRows;
     }
   };
@@ -832,7 +832,7 @@ namespace orc {
     // PASS
   }
 
-  static const unsigned long DIRECTORY_SIZE_GUESS = 16 * 1024;
+  static const uint64_t DIRECTORY_SIZE_GUESS = 16 * 1024;
 
   class ReaderImpl : public Reader {
   private:
@@ -846,20 +846,20 @@ namespace orc {
 
     // postscript
     proto::PostScript postscript;
-    unsigned long blockSize;
+    uint64_t blockSize;
     CompressionKind compression;
-    unsigned long postscriptLength;
+    uint64_t postscriptLength;
 
     // footer
     proto::Footer footer;
     DataBuffer<uint64_t> firstRowOfStripe;
-    unsigned long numberOfStripes;
+    uint64_t numberOfStripes;
     std::unique_ptr<Type> schema;
 
     // metadata
     bool isMetadataLoaded;
     proto::Metadata metadata;
-    unsigned long numberOfStripeStatistics;
+    uint64_t numberOfStripeStatistics;
 
     // reading state
     uint64_t previousRow;
@@ -900,9 +900,9 @@ namespace orc {
 
     std::string getFormatVersion() const override;
 
-    unsigned long getNumberOfRows() const override;
+    uint64_t getNumberOfRows() const override;
 
-    unsigned long getRowIndexStride() const override;
+    uint64_t getRowIndexStride() const override;
 
     const std::string& getStreamName() const override;
 
@@ -912,20 +912,20 @@ namespace orc {
 
     bool hasMetadataValue(const std::string& key) const override;
 
-    unsigned long getCompressionSize() const override;
+    uint64_t getCompressionSize() const override;
 
-    unsigned long getNumberOfStripes() const override;
+    uint64_t getNumberOfStripes() const override;
 
-    std::unique_ptr<StripeInformation> getStripe(unsigned long
+    std::unique_ptr<StripeInformation> getStripe(uint64_t
                                                  ) const override;
 
-    unsigned long getNumberOfStripeStatistics() const override;
+    uint64_t getNumberOfStripeStatistics() const override;
 
     std::unique_ptr<Statistics>
-    getStripeStatistics(unsigned long stripeIndex) const override;
+    getStripeStatistics(uint64_t stripeIndex) const override;
 
 
-    unsigned long getContentLength() const override;
+    uint64_t getContentLength() const override;
 
     std::unique_ptr<Statistics> getStatistics() const override;
 
@@ -936,14 +936,14 @@ namespace orc {
 
     const std::vector<bool> getSelectedColumns() const override;
 
-    std::unique_ptr<ColumnVectorBatch> createRowBatch(unsigned long size
+    std::unique_ptr<ColumnVectorBatch> createRowBatch(uint64_t size
                                                       ) const override;
 
     bool next(ColumnVectorBatch& data) override;
 
-    unsigned long getRowNumber() const override;
+    uint64_t getRowNumber() const override;
 
-    void seekToRow(unsigned long rowNumber) override;
+    void seekToRow(uint64_t rowNumber) override;
 
     MemoryPool* getMemoryPool() const ;
 
@@ -962,12 +962,12 @@ namespace orc {
                             firstRowOfStripe(memoryPool, 0) {
     isMetadataLoaded = false;
     // figure out the size of the file using the option or filesystem
-    unsigned long size = std::min(options.getTailLocation(),
-                                  static_cast<unsigned long>
+    uint64_t size = std::min(options.getTailLocation(),
+                                  static_cast<uint64_t>
                                   (stream->getLength()));
 
     //read last bytes into buffer to get PostScript
-    unsigned long readSize = std::min(size, DIRECTORY_SIZE_GUESS);
+    uint64_t readSize = std::min(size, DIRECTORY_SIZE_GUESS);
 
     if (readSize < 1) {
       throw ParseError("File size too small");
@@ -981,7 +981,7 @@ namespace orc {
     currentStripe = static_cast<uint64_t>(footer.stripes_size());
     lastStripe = 0;
     currentRowInStripe = 0;
-    unsigned long rowTotal = 0;
+    uint64_t rowTotal = 0;
 
     firstRowOfStripe.resize(static_cast<uint64_t>(footer.stripes_size()));
     for(size_t i=0; i < static_cast<size_t>(footer.stripes_size()); ++i) {
@@ -1003,7 +1003,7 @@ namespace orc {
 
     schema = convertType(footer.types(0), footer);
     schema->assignIds(0);
-    previousRow = (std::numeric_limits<unsigned long>::max)();
+    previousRow = (std::numeric_limits<uint64_t>::max)();
 
     selectedColumns.assign(static_cast<size_t>(footer.types_size()), false);
 
@@ -1025,20 +1025,20 @@ namespace orc {
     return compression;
   }
 
-  unsigned long ReaderImpl::getCompressionSize() const {
+  uint64_t ReaderImpl::getCompressionSize() const {
     return blockSize;
   }
 
-  unsigned long ReaderImpl::getNumberOfStripes() const {
+  uint64_t ReaderImpl::getNumberOfStripes() const {
     return numberOfStripes;
   }
 
-  unsigned long ReaderImpl::getNumberOfStripeStatistics() const {
+  uint64_t ReaderImpl::getNumberOfStripeStatistics() const {
     return numberOfStripeStatistics;
   }
 
   std::unique_ptr<StripeInformation>
-  ReaderImpl::getStripe(unsigned long stripeIndex) const {
+  ReaderImpl::getStripe(uint64_t stripeIndex) const {
     if (stripeIndex > getNumberOfStripes()) {
       throw std::logic_error("stripe index out of range");
     }
@@ -1065,15 +1065,15 @@ namespace orc {
     return result;
   }
 
-  unsigned long ReaderImpl::getNumberOfRows() const {
+  uint64_t ReaderImpl::getNumberOfRows() const {
     return footer.numberofrows();
   }
 
-  unsigned long ReaderImpl::getContentLength() const {
+  uint64_t ReaderImpl::getContentLength() const {
     return footer.contentlength();
   }
 
-  unsigned long ReaderImpl::getRowIndexStride() const {
+  uint64_t ReaderImpl::getRowIndexStride() const {
     return footer.rowindexstride();
   }
 
@@ -1168,7 +1168,7 @@ namespace orc {
     return *(schema.get());
   }
 
-  unsigned long ReaderImpl::getRowNumber() const {
+  uint64_t ReaderImpl::getRowNumber() const {
     return previousRow;
   }
 
@@ -1189,7 +1189,7 @@ namespace orc {
   }
 
   std::unique_ptr<Statistics>
-  ReaderImpl::getStripeStatistics(unsigned long stripeIndex) const {
+  ReaderImpl::getStripeStatistics(uint64_t stripeIndex) const {
     if(numberOfStripeStatistics == 0){
       throw std::logic_error("No stripe statistics in file");
     }
@@ -1203,7 +1203,7 @@ namespace orc {
   }
 
 
-  void ReaderImpl::seekToRow(unsigned long) {
+  void ReaderImpl::seekToRow(uint64_t) {
     throw NotImplementedYet("seekToRow");
   }
 
@@ -1261,7 +1261,7 @@ namespace orc {
       throw ParseError("Failed to parse the footer");
     }
 
-    numberOfStripes = static_cast<unsigned long>(footer.stripes_size());
+    numberOfStripes = static_cast<uint64_t>(footer.stripes_size());
     pbStream =
       createDecompressor(compression,
                          std::unique_ptr<SeekableInputStream>
@@ -1273,14 +1273,14 @@ namespace orc {
       throw ParseError("Failed to parse the metadata");
     }
     numberOfStripeStatistics =
-      static_cast<unsigned long>(metadata.stripestats_size());
+      static_cast<uint64_t>(metadata.stripestats_size());
   }
 
   proto::StripeFooter ReaderImpl::getStripeFooter
   (const proto::StripeInformation& info) {
-    unsigned long footerStart = info.offset() + info.indexlength() +
+    uint64_t footerStart = info.offset() + info.indexlength() +
       info.datalength();
-    unsigned long footerLength = info.footerlength();
+    uint64_t footerLength = info.footerlength();
     std::unique_ptr<SeekableInputStream> pbStream =
       createDecompressor(compression,
                          std::unique_ptr<SeekableInputStream>
@@ -1304,14 +1304,14 @@ namespace orc {
   private:
     const ReaderImpl& reader;
     const proto::StripeFooter& footer;
-    const unsigned long stripeStart;
+    const uint64_t stripeStart;
     InputStream& input;
     MemoryPool& memoryPool;
 
   public:
     StripeStreamsImpl(const ReaderImpl& reader,
                       const proto::StripeFooter& footer,
-                      unsigned long stripeStart,
+                      uint64_t stripeStart,
                       InputStream& input,
                       MemoryPool& memoryPool);
 
@@ -1333,7 +1333,7 @@ namespace orc {
 
   StripeStreamsImpl::StripeStreamsImpl(const ReaderImpl& _reader,
                                        const proto::StripeFooter& _footer,
-                                       unsigned long _stripeStart,
+                                       uint64_t _stripeStart,
                                        InputStream& _input,
                                        MemoryPool& _memoryPool
                                        ): reader(_reader),
@@ -1364,7 +1364,7 @@ namespace orc {
   StripeStreamsImpl::getStream(int columnId,
                                proto::Stream_Kind kind,
                                bool shouldStream) const {
-    unsigned long offset = stripeStart;
+    uint64_t offset = stripeStart;
     for(int i = 0; i < footer.streams_size(); ++i) {
       const proto::Stream& stream = footer.streams(i);
       if (stream.has_kind() &&
@@ -1521,7 +1521,7 @@ namespace orc {
   }
 
   std::unique_ptr<ColumnVectorBatch> ReaderImpl::createRowBatch
-                                              (unsigned long capacity) const {
+                                              (uint64_t capacity) const {
     return createRowBatch(*(schema.get()), capacity);
   }
 
