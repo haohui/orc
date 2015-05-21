@@ -29,7 +29,7 @@
   #pragma GCC diagnostic ignored "-Wconversion"
 #endif
 
-#include "orc_proto.pb.h"
+#include "orc/orc_proto.pb.h"
 
 #ifdef __clang__
   #pragma clang diagnostic pop

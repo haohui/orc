@@ -14,6 +14,7 @@ include_directories (
   ${PROJECT_SOURCE_DIR}/orc-c++/include
   ${PROJECT_SOURCE_DIR}/orc-c++/src
   ${PROJECT_BINARY_DIR}/orc-c++/src
+  ${PROJECT_BINARY_DIR}/orc-c++/src/orc
   ${PROTOBUF_INCLUDE_DIRS}
   )
 

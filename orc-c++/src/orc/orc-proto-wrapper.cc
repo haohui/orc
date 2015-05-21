@@ -32,4 +32,4 @@
   #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
-#include "orc_proto.pb.cc"
+#include "orc/orc_proto.pb.cc"
