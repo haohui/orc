@@ -1055,14 +1055,14 @@ namespace orc {
   }
 
   std::string ReaderImpl::getFormatVersion() const {
-    std::string result;
+    std::stringstream result;
     for(int i=0; i < postscript.version_size(); ++i) {
       if (i != 0) {
-        result += ".";
+        result << ".";
       }
-      result += std::to_string(postscript.version(i));
+      result << postscript.version(i);
     }
-    return result;
+    return result.str();
   }
 
   uint64_t ReaderImpl::getNumberOfRows() const {
