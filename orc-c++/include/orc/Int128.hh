@@ -326,7 +326,7 @@ namespace orc {
      * @param wasNegative set to true if the original number was negative
      * @return the number of elements that were set in the array (1 to 4)
      */
-    int fillInArray(uint32_t* array, bool &wasNegative) const;
+    int64_t fillInArray(uint32_t* array, bool &wasNegative) const;
 
   private:
     static const uint64_t LONG_SIGN_BIT = 0x8000000000000000u;

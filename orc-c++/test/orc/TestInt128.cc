@@ -328,7 +328,7 @@ namespace orc {
     EXPECT_EQ(32, fls(0x80000000));
   }
 
-  void shiftArrayLeft(uint32_t* array, int length, int bits);
+  void shiftArrayLeft(uint32_t* array, int64_t length, int64_t bits);
 
   TEST(Int128, testShiftArrayLeft) {
     uint32_t array[5];
@@ -370,7 +370,7 @@ namespace orc {
     EXPECT_EQ(0x54321000, array[4]);
   }
 
-  void shiftArrayRight(uint32_t* array, int length, int bits);
+  void shiftArrayRight(uint32_t* array, int64_t length, int64_t bits);
 
   TEST(Int128, testShiftArrayRight) {
     uint32_t array[4];
@@ -426,7 +426,7 @@ namespace orc {
 
   }
 
-  void buildFromArray(Int128& value, uint32_t* array, int length);
+  void buildFromArray(Int128& value, uint32_t* array, int64_t length);
 
   TEST(Int128, testBuildFromArray) {
     Int128 result;
@@ -450,7 +450,7 @@ namespace orc {
     EXPECT_THROW(buildFromArray(result, array, 5), std::logic_error);
   }
 
-  Int128 singleDivide(uint32_t* dividend, int dividendLength,
+  Int128 singleDivide(uint32_t* dividend, int64_t dividendLength,
                       uint32_t divisor, Int128& remainder,
                       bool dividendWasNegative, bool divisorWasNegative);
 

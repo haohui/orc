@@ -32,7 +32,7 @@ namespace orc {
   }
 
   inline RleVersion convertRleVersion(proto::ColumnEncoding_Kind kind) {
-    switch (static_cast<int>(kind)) {
+    switch (static_cast<int64_t>(kind)) {
     case proto::ColumnEncoding_Kind_DIRECT:
     case proto::ColumnEncoding_Kind_DICTIONARY:
       return RleVersion_1;
@@ -59,7 +59,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long ColumnReader::skip(unsigned long numValues) {
+  uint64_t ColumnReader::skip(uint64_t numValues) {
     ByteRleDecoder* decoder = notNullDecoder.get();
     if (decoder) {
       // page through the values that we want to skip
@@ -68,14 +68,14 @@ namespace orc {
       size_t bufferSize = std::min(MAX_BUFFER_SIZE,
                                    static_cast<size_t>(numValues));
       char buffer[MAX_BUFFER_SIZE];
-      unsigned long remaining = numValues;
+      uint64_t remaining = numValues;
       while (remaining > 0) {
-        unsigned long chunkSize =
+        uint64_t chunkSize =
           std::min(remaining,
-                   static_cast<unsigned long>(bufferSize));
+                   static_cast<uint64_t>(bufferSize));
         decoder->next(buffer, chunkSize, 0);
         remaining -= chunkSize;
-        for(unsigned long i=0; i < chunkSize; ++i) {
+        for(uint64_t i=0; i < chunkSize; ++i) {
           if (!buffer[i]) {
             numValues -= 1;
           }
@@ -86,7 +86,7 @@ namespace orc {
   }
 
   void ColumnReader::next(ColumnVectorBatch& rowBatch,
-                          unsigned long numValues,
+                          uint64_t numValues,
                           char* incomingMask) {
     if (numValues > rowBatch.capacity) {
       rowBatch.resize(numValues);
@@ -97,7 +97,7 @@ namespace orc {
       char* notNullArray = rowBatch.notNull.data();
       decoder->next(notNullArray, numValues, incomingMask);
       // check to see if there are nulls in this batch
-      for(unsigned long i=0; i < numValues; ++i) {
+      for(uint64_t i=0; i < numValues; ++i) {
         if (!notNullArray[i]) {
           rowBatch.hasNulls = true;
           return;
@@ -134,10 +134,10 @@ namespace orc {
     BooleanColumnReader(const Type& type, StripeStreams& stipe);
     ~BooleanColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char* notNull) override;
   };
 
@@ -153,14 +153,14 @@ namespace orc {
     // PASS
   }
 
-  unsigned long BooleanColumnReader::skip(unsigned long numValues) {
+  uint64_t BooleanColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     rle->skip(numValues);
     return numValues;
   }
 
   void BooleanColumnReader::next(ColumnVectorBatch& rowBatch,
-                                 unsigned long numValues,
+                                 uint64_t numValues,
                                  char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     // Since the byte rle places the output in a char* instead of long*,
@@ -179,10 +179,10 @@ namespace orc {
     ByteColumnReader(const Type& type, StripeStreams& stipe);
     ~ByteColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char* notNull) override;
   };
 
@@ -198,14 +198,14 @@ namespace orc {
     // PASS
   }
 
-  unsigned long ByteColumnReader::skip(unsigned long numValues) {
+  uint64_t ByteColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     rle->skip(numValues);
     return numValues;
   }
 
   void ByteColumnReader::next(ColumnVectorBatch& rowBatch,
-                              unsigned long numValues,
+                              uint64_t numValues,
                               char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     // Since the byte rle places the output in a char* instead of long*,
@@ -224,10 +224,10 @@ namespace orc {
     IntegerColumnReader(const Type& type, StripeStreams& stripe);
     ~IntegerColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char* notNull) override;
   };
 
@@ -245,14 +245,14 @@ namespace orc {
     // PASS
   }
 
-  unsigned long IntegerColumnReader::skip(unsigned long numValues) {
+  uint64_t IntegerColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     rle->skip(numValues);
     return numValues;
   }
 
   void IntegerColumnReader::next(ColumnVectorBatch& rowBatch,
-                                 unsigned long numValues,
+                                 uint64_t numValues,
                                  char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     rle->next(dynamic_cast<LongVectorBatch&>(rowBatch).data.data(),
@@ -268,10 +268,10 @@ namespace orc {
     TimestampColumnReader(const Type& type, StripeStreams& stripe);
     ~TimestampColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char* notNull) override;
   };
 
@@ -292,14 +292,14 @@ namespace orc {
     // PASS
   }
 
-  unsigned long TimestampColumnReader::skip(unsigned long numValues) {
+  uint64_t TimestampColumnReader::skip(uint64_t numValues) {
     numValues = IntegerColumnReader::skip(numValues);
     nanoRle->skip(numValues);
     return numValues;
   }
 
   void TimestampColumnReader::next(ColumnVectorBatch& rowBatch,
-                                 unsigned long numValues,
+                                 uint64_t numValues,
                                  char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : nullptr;
@@ -314,7 +314,7 @@ namespace orc {
     nanoRle->next(nanoBuffer.data(), numValues, notNull);
 
     // Construct the values
-    for(unsigned int i=0; i < numValues; i++) {
+    for(uint64_t i=0; i < numValues; i++) {
       if (notNull == nullptr || notNull[i]) {
         int64_t nanosec =  nanoBuffer[i] >> 3;
         uint64_t zeros = nanoBuffer[i] & 0x7;
@@ -338,16 +338,16 @@ namespace orc {
     DoubleColumnReader(const Type& type, StripeStreams& stripe);
     ~DoubleColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char* notNull) override;
 
   private:
     std::unique_ptr<SeekableInputStream> inputStream;
     TypeKind columnKind;
-    const unsigned int bytesPerValue ;
+    const uint64_t bytesPerValue ;
     const char *bufferPointer;
     const char *bufferEnd;
 
@@ -365,7 +365,7 @@ namespace orc {
 
     double readDouble() {
       int64_t bits = 0;
-      for (unsigned int i=0; i < 8; i++) {
+      for (uint64_t i=0; i < 8; i++) {
         bits |= static_cast<int64_t>(readByte()) << (i*8);
       }
       double *result = reinterpret_cast<double*>(&bits);
@@ -374,7 +374,7 @@ namespace orc {
 
     double readFloat() {
       int32_t bits = 0;
-      for (unsigned int i=0; i < 4; i++) {
+      for (uint64_t i=0; i < 4; i++) {
         bits |= readByte() << (i*8);
       }
       float *result = reinterpret_cast<float*>(&bits);
@@ -402,7 +402,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long DoubleColumnReader::skip(unsigned long numValues) {
+  uint64_t DoubleColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
 
     if (static_cast<size_t>(bufferEnd - bufferPointer) >=
@@ -420,7 +420,7 @@ namespace orc {
   }
 
   void DoubleColumnReader::next(ColumnVectorBatch& rowBatch,
-                                unsigned long numValues,
+                                uint64_t numValues,
                                 char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     // update the notNull from the parent class
@@ -454,8 +454,8 @@ namespace orc {
     }
   }
 
-  void readFully(char* buffer, long bufferSize, SeekableInputStream* stream) {
-    long posn = 0;
+  void readFully(char* buffer, int64_t bufferSize, SeekableInputStream* stream) {
+    int64_t posn = 0;
     while (posn < bufferSize) {
       const void* chunk;
       int length;
@@ -472,16 +472,16 @@ namespace orc {
     DataBuffer<char> dictionaryBlob;
     DataBuffer<int64_t> dictionaryOffset;
     std::unique_ptr<RleDecoder> rle;
-    unsigned int dictionaryCount;
+    uint64_t dictionaryCount;
 
   public:
     StringDictionaryColumnReader(const Type& type, StripeStreams& stipe);
     ~StringDictionaryColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -507,10 +507,10 @@ namespace orc {
     int64_t* lengthArray = dictionaryOffset.data();
     lengthDecoder->next(lengthArray + 1, dictionaryCount, 0);
     lengthArray[0] = 0;
-    for(unsigned int i=1; i < dictionaryCount + 1; ++i) {
+    for(uint64_t i=1; i < dictionaryCount + 1; ++i) {
       lengthArray[i] += lengthArray[i-1];
     }
-    long blobSize = lengthArray[dictionaryCount];
+    int64_t blobSize = lengthArray[dictionaryCount];
     dictionaryBlob.resize(static_cast<uint64_t>(blobSize));
     std::unique_ptr<SeekableInputStream> blobStream =
       stripe.getStream(columnId, proto::Stream_Kind_DICTIONARY_DATA, false);
@@ -521,14 +521,14 @@ namespace orc {
     // PASS
   }
 
-  unsigned long StringDictionaryColumnReader::skip(unsigned long numValues) {
+  uint64_t StringDictionaryColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     rle->skip(numValues);
     return numValues;
   }
 
   void StringDictionaryColumnReader::next(ColumnVectorBatch& rowBatch,
-                                          unsigned long numValues,
+                                          uint64_t numValues,
                                           char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     // update the notNull from the parent class
@@ -540,17 +540,17 @@ namespace orc {
     int64_t *outputLengths = byteBatch.length.data();
     rle->next(outputLengths, numValues, notNull);
     if (notNull) {
-      for(unsigned int i=0; i < numValues; ++i) {
+      for(uint64_t i=0; i < numValues; ++i) {
         if (notNull[i]) {
-          long entry = outputLengths[i];
+          int64_t entry = outputLengths[i];
           outputStarts[i] = blob + dictionaryOffsets[entry];
           outputLengths[i] = dictionaryOffsets[entry+1] -
             dictionaryOffsets[entry];
         }
       }
     } else {
-      for(unsigned int i=0; i < numValues; ++i) {
-        long entry = outputLengths[i];
+      for(uint64_t i=0; i < numValues; ++i) {
+        int64_t entry = outputLengths[i];
         outputStarts[i] = blob + dictionaryOffsets[entry];
         outputLengths[i] = dictionaryOffsets[entry+1] -
           dictionaryOffsets[entry];
@@ -580,10 +580,10 @@ namespace orc {
     StringDirectColumnReader(const Type& type, StripeStreams& stipe);
     ~StringDirectColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -607,7 +607,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long StringDirectColumnReader::skip(unsigned long numValues) {
+  uint64_t StringDirectColumnReader::skip(uint64_t numValues) {
     const size_t BUFFER_SIZE = 1024;
     numValues = ColumnReader::skip(numValues);
     int64_t buffer[BUFFER_SIZE];
@@ -615,7 +615,7 @@ namespace orc {
     size_t totalBytes = 0;
     // read the lengths, so we know haw many bytes to skip
     while (done < numValues) {
-      unsigned long step = std::min(BUFFER_SIZE,
+      uint64_t step = std::min(BUFFER_SIZE,
                                     static_cast<size_t>(numValues - done));
       lengthRle->next(buffer, step, 0);
       totalBytes += computeSize(buffer, 0, step);
@@ -654,7 +654,7 @@ namespace orc {
   }
 
   void StringDirectColumnReader::next(ColumnVectorBatch& rowBatch,
-                                      unsigned long numValues,
+                                      uint64_t numValues,
                                       char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     // update the notNull from the parent class
@@ -751,10 +751,10 @@ namespace orc {
     StructColumnReader(const Type& type, StripeStreams& stipe);
     ~StructColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -763,11 +763,11 @@ namespace orc {
                                          ): ColumnReader(type, stripe) {
     // count the number of selected sub-columns
     const std::vector<bool> selectedColumns = stripe.getSelectedColumns();
-    switch (static_cast<int>(stripe.getEncoding(columnId).kind())) {
+    switch (static_cast<int64_t>(stripe.getEncoding(columnId).kind())) {
     case proto::ColumnEncoding_Kind_DIRECT:
       for(unsigned int i=0; i < type.getSubtypeCount(); ++i) {
         const Type& child = type.getSubtype(i);
-        if (selectedColumns[static_cast<unsigned int>(child.getColumnId())]) {
+        if (selectedColumns[static_cast<uint64_t>(child.getColumnId())]) {
           children.push_back(buildReader(child, stripe).release());
         }
       }
@@ -786,7 +786,7 @@ namespace orc {
     }
   }
 
-  unsigned long StructColumnReader::skip(unsigned long numValues) {
+  uint64_t StructColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     for(std::vector<ColumnReader*>::iterator ptr=children.begin(); ptr != children.end(); ++ptr) {
       (*ptr)->skip(numValues);
@@ -795,10 +795,10 @@ namespace orc {
   }
 
   void StructColumnReader::next(ColumnVectorBatch& rowBatch,
-                                unsigned long numValues,
+                                uint64_t numValues,
                                 char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
-    unsigned int i=0;
+    uint64_t i=0;
     notNull = rowBatch.hasNulls? rowBatch.notNull.data() : 0;
     for(std::vector<ColumnReader*>::iterator ptr=children.begin();
         ptr != children.end(); ++ptr, ++i) {
@@ -816,10 +816,10 @@ namespace orc {
     ListColumnReader(const Type& type, StripeStreams& stipe);
     ~ListColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -834,7 +834,7 @@ namespace orc {
                                             true),
                            false, vers, memoryPool);
     const Type& childType = type.getSubtype(0);
-    if (selectedColumns[static_cast<unsigned int>(childType.getColumnId())]) {
+    if (selectedColumns[static_cast<uint64_t>(childType.getColumnId())]) {
       child = buildReader(childType, stripe);
     }
   }
@@ -843,7 +843,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long ListColumnReader::skip(unsigned long numValues) {
+  uint64_t ListColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     ColumnReader *childReader = child.get();
     if (childReader) {
@@ -867,32 +867,32 @@ namespace orc {
   }
 
   void ListColumnReader::next(ColumnVectorBatch& rowBatch,
-                              unsigned long numValues,
+                              uint64_t numValues,
                               char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     ListVectorBatch &listBatch = dynamic_cast<ListVectorBatch&>(rowBatch);
     int64_t* offsets = listBatch.offsets.data();
     notNull = listBatch.hasNulls ? listBatch.notNull.data() : 0;
     rle->next(offsets, numValues, notNull);
-    unsigned long totalChildren = 0;
+    uint64_t totalChildren = 0;
     if (notNull) {
       for(size_t i=0; i < numValues; ++i) {
         if (notNull[i]) {
-          unsigned long tmp = static_cast<unsigned long>(offsets[i]);
-          offsets[i] = static_cast<long>(totalChildren);
+          uint64_t tmp = static_cast<uint64_t>(offsets[i]);
+          offsets[i] = static_cast<int64_t>(totalChildren);
           totalChildren += tmp;
         } else {
-          offsets[i] = static_cast<long>(totalChildren);
+          offsets[i] = static_cast<int64_t>(totalChildren);
         }
       }
     } else {
       for(size_t i=0; i < numValues; ++i) {
-        unsigned long tmp = static_cast<unsigned long>(offsets[i]);
-        offsets[i] = static_cast<long>(totalChildren);
+        uint64_t tmp = static_cast<uint64_t>(offsets[i]);
+        offsets[i] = static_cast<int64_t>(totalChildren);
         totalChildren += tmp;
       }
     }
-    offsets[numValues] = static_cast<long>(totalChildren);
+    offsets[numValues] = static_cast<int64_t>(totalChildren);
     ColumnReader *childReader = child.get();
     if (childReader) {
       childReader->next(*(listBatch.elements.get()), totalChildren, 0);
@@ -909,10 +909,10 @@ namespace orc {
     MapColumnReader(const Type& type, StripeStreams& stipe);
     ~MapColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -927,11 +927,11 @@ namespace orc {
                                             true),
                            false, vers, memoryPool);
     const Type& keyType = type.getSubtype(0);
-    if (selectedColumns[static_cast<unsigned int>(keyType.getColumnId())]) {
+    if (selectedColumns[static_cast<uint64_t>(keyType.getColumnId())]) {
       keyReader = buildReader(keyType, stripe);
     }
     const Type& elementType = type.getSubtype(1);
-    if (selectedColumns[static_cast<unsigned int>(elementType.getColumnId())]) {
+    if (selectedColumns[static_cast<uint64_t>(elementType.getColumnId())]) {
       elementReader = buildReader(elementType, stripe);
     }
   }
@@ -940,7 +940,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long MapColumnReader::skip(unsigned long numValues) {
+  uint64_t MapColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     ColumnReader *rawKeyReader = keyReader.get();
     ColumnReader *rawElementReader = elementReader.get();
@@ -950,7 +950,7 @@ namespace orc {
       uint64_t childrenElements = 0;
       uint64_t lengthsRead = 0;
       while (lengthsRead < numValues) {
-        unsigned long chunk = std::min(numValues - lengthsRead, BUFFER_SIZE);
+        uint64_t chunk = std::min(numValues - lengthsRead, BUFFER_SIZE);
         rle->next(buffer, chunk, 0);
         for(size_t i=0; i < chunk; ++i) {
           childrenElements += static_cast<size_t>(buffer[i]);
@@ -970,32 +970,32 @@ namespace orc {
   }
 
   void MapColumnReader::next(ColumnVectorBatch& rowBatch,
-                             unsigned long numValues,
+                             uint64_t numValues,
                              char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     MapVectorBatch &mapBatch = dynamic_cast<MapVectorBatch&>(rowBatch);
     int64_t* offsets = mapBatch.offsets.data();
     notNull = mapBatch.hasNulls ? mapBatch.notNull.data() : 0;
     rle->next(offsets, numValues, notNull);
-    unsigned long totalChildren = 0;
+    uint64_t totalChildren = 0;
     if (notNull) {
       for(size_t i=0; i < numValues; ++i) {
         if (notNull[i]) {
-          unsigned long tmp = static_cast<unsigned long>(offsets[i]);
-          offsets[i] = static_cast<long>(totalChildren);
+          uint64_t tmp = static_cast<uint64_t>(offsets[i]);
+          offsets[i] = static_cast<int64_t>(totalChildren);
           totalChildren += tmp;
         } else {
-          offsets[i] = static_cast<long>(totalChildren);
+          offsets[i] = static_cast<int64_t>(totalChildren);
         }
       }
     } else {
       for(size_t i=0; i < numValues; ++i) {
-        unsigned long tmp = static_cast<unsigned long>(offsets[i]);
-        offsets[i] = static_cast<long>(totalChildren);
+        uint64_t tmp = static_cast<uint64_t>(offsets[i]);
+        offsets[i] = static_cast<int64_t>(totalChildren);
         totalChildren += tmp;
       }
     }
-    offsets[numValues] = static_cast<long>(totalChildren);
+    offsets[numValues] = static_cast<int64_t>(totalChildren);
     ColumnReader *rawKeyReader = keyReader.get();
     if (rawKeyReader) {
       rawKeyReader->next(*(mapBatch.keys.get()), totalChildren, 0);
@@ -1017,10 +1017,10 @@ namespace orc {
     UnionColumnReader(const Type& type, StripeStreams& stipe);
     ~UnionColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -1036,7 +1036,7 @@ namespace orc {
                                                 true));
     // figure out which types are selected
     const std::vector<bool> selectedColumns = stripe.getSelectedColumns();
-    for(uint i=0; i < numChildren; ++i) {
+    for(unsigned int i=0; i < numChildren; ++i) {
       const Type &child = type.getSubtype(i);
       if (selectedColumns[static_cast<size_t>(child.getColumnId())]) {
         childrenReader[i] = buildReader(child, stripe).release();
@@ -1051,7 +1051,7 @@ namespace orc {
     }
   }
 
-  unsigned long UnionColumnReader::skip(unsigned long numValues) {
+  uint64_t UnionColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     const uint64_t BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
@@ -1059,7 +1059,7 @@ namespace orc {
     int64_t *counts = childrenCounts.data();
     memset(counts, 0, sizeof(int64_t) * numChildren);
     while (lengthsRead < numValues) {
-      unsigned long chunk = std::min(numValues - lengthsRead, BUFFER_SIZE);
+      uint64_t chunk = std::min(numValues - lengthsRead, BUFFER_SIZE);
       rle->next(buffer, chunk, 0);
       for(size_t i=0; i < chunk; ++i) {
         counts[static_cast<size_t>(buffer[i])] += 1;
@@ -1075,7 +1075,7 @@ namespace orc {
   }
 
   void UnionColumnReader::next(ColumnVectorBatch& rowBatch,
-                               unsigned long numValues,
+                               uint64_t numValues,
                                char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     UnionVectorBatch &unionBatch = dynamic_cast<UnionVectorBatch&>(rowBatch);
@@ -1175,10 +1175,10 @@ namespace orc {
     Decimal64ColumnReader(const Type& type, StripeStreams& stipe);
     ~Decimal64ColumnReader();
 
-    unsigned long skip(unsigned long numValues) override;
+    uint64_t skip(uint64_t numValues) override;
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
   const int32_t Decimal64ColumnReader::MAX_PRECISION_64;
@@ -1224,7 +1224,7 @@ namespace orc {
     // PASS
   }
 
-  unsigned long Decimal64ColumnReader::skip(unsigned long numValues) {
+  uint64_t Decimal64ColumnReader::skip(uint64_t numValues) {
     numValues = ColumnReader::skip(numValues);
     uint64_t skipped = 0;
     while (skipped < numValues) {
@@ -1238,7 +1238,7 @@ namespace orc {
   }
 
   void Decimal64ColumnReader::next(ColumnVectorBatch& rowBatch,
-                                   unsigned long numValues,
+                                   uint64_t numValues,
                                    char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : 0;
@@ -1266,7 +1266,7 @@ namespace orc {
   void scaleInt128(Int128& value, int32_t scale, int32_t currentScale) {
     if (scale > currentScale) {
       while(scale > currentScale) {
-        int scaleAdjust = std::min(Decimal64ColumnReader::MAX_PRECISION_64,
+        int32_t scaleAdjust = std::min(Decimal64ColumnReader::MAX_PRECISION_64,
                                    scale - currentScale);
         value *= Decimal64ColumnReader::POWERS_OF_TEN[scaleAdjust];
         currentScale += scaleAdjust;
@@ -1274,7 +1274,7 @@ namespace orc {
     } else if (scale < currentScale) {
       Int128 remainder;
       while(currentScale > scale) {
-        int scaleAdjust = std::min(Decimal64ColumnReader::MAX_PRECISION_64,
+        int32_t scaleAdjust = std::min(Decimal64ColumnReader::MAX_PRECISION_64,
                                    currentScale - scale);
         value = value.divide(Decimal64ColumnReader::POWERS_OF_TEN[scaleAdjust],
                              remainder);
@@ -1289,7 +1289,7 @@ namespace orc {
     ~Decimal128ColumnReader();
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
 
   private:
@@ -1325,7 +1325,7 @@ namespace orc {
   }
 
   void Decimal128ColumnReader::next(ColumnVectorBatch& rowBatch,
-                                   unsigned long numValues,
+                                   uint64_t numValues,
                                    char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : 0;
@@ -1397,7 +1397,7 @@ namespace orc {
     ~DecimalHive11ColumnReader();
 
     void next(ColumnVectorBatch& rowBatch,
-              unsigned long numValues,
+              uint64_t numValues,
               char *notNull) override;
   };
 
@@ -1416,7 +1416,7 @@ namespace orc {
   }
 
   void DecimalHive11ColumnReader::next(ColumnVectorBatch& rowBatch,
-                                       unsigned long numValues,
+                                       uint64_t numValues,
                                        char *notNull) {
     ColumnReader::next(rowBatch, numValues, notNull);
     notNull = rowBatch.hasNulls ? rowBatch.notNull.data() : 0;
@@ -1469,7 +1469,7 @@ namespace orc {
    */
   std::unique_ptr<ColumnReader> buildReader(const Type& type,
                                             StripeStreams& stripe) {
-    switch (static_cast<int>(type.getKind())) {
+    switch (static_cast<int64_t>(type.getKind())) {
     case DATE:
     case INT:
     case LONG:
@@ -1480,7 +1480,7 @@ namespace orc {
     case CHAR:
     case STRING:
     case VARCHAR:
-      switch (static_cast<int>(stripe.getEncoding(type.getColumnId()).kind())){
+      switch (static_cast<int64_t>(stripe.getEncoding(type.getColumnId()).kind())){
       case proto::ColumnEncoding_Kind_DICTIONARY:
       case proto::ColumnEncoding_Kind_DICTIONARY_V2:
         return std::unique_ptr<ColumnReader>(

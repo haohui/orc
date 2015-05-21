@@ -59,28 +59,28 @@ namespace orc {
   class Type {
   public:
     virtual ~Type();
-    virtual int assignIds(int root) = 0;
-    virtual int getColumnId() const = 0;
+    virtual int64_t assignIds(int64_t root) = 0;
+    virtual int64_t getColumnId() const = 0;
     virtual TypeKind getKind() const = 0;
-    virtual unsigned int getSubtypeCount() const = 0;
-    virtual const Type& getSubtype(unsigned int typeId) const = 0;
-    virtual const std::string& getFieldName(unsigned int fieldId) const = 0;
-    virtual unsigned int getMaximumLength() const = 0;
-    virtual unsigned int getPrecision() const = 0;
-    virtual unsigned int getScale() const = 0;
+    virtual uint64_t getSubtypeCount() const = 0;
+    virtual const Type& getSubtype(uint64_t typeId) const = 0;
+    virtual const std::string& getFieldName(uint64_t fieldId) const = 0;
+    virtual uint64_t getMaximumLength() const = 0;
+    virtual uint64_t getPrecision() const = 0;
+    virtual uint64_t getScale() const = 0;
     virtual std::string toString() const = 0;
   };
 
-  const int DEFAULT_DECIMAL_SCALE = 18;
-  const int DEFAULT_DECIMAL_PRECISION = 38;
+  const int64_t DEFAULT_DECIMAL_SCALE = 18;
+  const int64_t DEFAULT_DECIMAL_PRECISION = 38;
 
   std::unique_ptr<Type> createPrimitiveType(TypeKind kind);
   std::unique_ptr<Type> createCharType(TypeKind kind,
-                                       unsigned int maxLength);
+                                       uint64_t maxLength);
   std::unique_ptr<Type>
-                createDecimalType(unsigned int precision=
+                createDecimalType(uint64_t precision=
                                     DEFAULT_DECIMAL_PRECISION,
-                                  unsigned int scale=DEFAULT_DECIMAL_SCALE);
+                                  uint64_t scale=DEFAULT_DECIMAL_SCALE);
   std::unique_ptr<Type>
     createStructType(std::vector<Type*> types,
                       std::vector<std::string> fieldNames);

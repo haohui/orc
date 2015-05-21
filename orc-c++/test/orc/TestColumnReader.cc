@@ -35,12 +35,12 @@ namespace orc {
 class MockStripeStreams: public StripeStreams {
 public:
   ~MockStripeStreams();
-  std::unique_ptr<SeekableInputStream> getStream(int columnId,
+  std::unique_ptr<SeekableInputStream> getStream(int64_t columnId,
                                                  proto::Stream_Kind kind,
                                                  bool stream) const override;
   MOCK_CONST_METHOD0(getReaderOptions, const ReaderOptions&());
   MOCK_CONST_METHOD0(getSelectedColumns, const std::vector<bool>());
-  MOCK_CONST_METHOD1(getEncoding, proto::ColumnEncoding (int));
+  MOCK_CONST_METHOD1(getEncoding, proto::ColumnEncoding (int64_t));
   MOCK_CONST_METHOD3(getStreamProxy, SeekableInputStream*
                      (int, proto::Stream_Kind, bool));
   MemoryPool& getMemoryPool() const {
@@ -53,7 +53,7 @@ MockStripeStreams::~MockStripeStreams() {
 }
 
 std::unique_ptr<SeekableInputStream>
-MockStripeStreams::getStream(int columnId,
+MockStripeStreams::getStream(int64_t columnId,
                              proto::Stream_Kind kind,
                              bool shouldStream) const {
   return std::unique_ptr < SeekableInputStream >

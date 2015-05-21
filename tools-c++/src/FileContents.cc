@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   orc::ReaderOptions opts;
-  std::list<int> cols;
+  std::list<int64_t> cols;
   cols.push_back(0);
   opts.include(cols);
 

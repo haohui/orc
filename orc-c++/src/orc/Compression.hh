@@ -70,15 +70,15 @@ namespace orc {
 
     #if __cplusplus >= 201103L
       SeekableArrayInputStream(std::initializer_list<unsigned char> list,
-                               long block_size = -1);
+                               int64_t block_size = -1);
     #endif // __cplusplus
 
     SeekableArrayInputStream(const unsigned char* list,
                              uint64_t length,
-                             long block_size = -1);
+                             int64_t block_size = -1);
     SeekableArrayInputStream(const char* list,
                              uint64_t length,
-                             long block_size = -1);
+                             int64_t block_size = -1);
     virtual ~SeekableArrayInputStream();
     virtual bool Next(const void** data, int*size) override;
     virtual void BackUp(int count) override;
@@ -105,7 +105,7 @@ namespace orc {
     SeekableFileInputStream(InputStream* input,
                             uint64_t offset,
                             uint64_t byteCount,
-                            long blockSize = -1);
+                            int64_t blockSize = -1);
     virtual ~SeekableFileInputStream();
 
     virtual bool Next(const void** data, int*size) override;

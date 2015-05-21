@@ -45,7 +45,7 @@ namespace orc {
     /**
      * Get the encoding for the given column for this stripe.
      */
-    virtual proto::ColumnEncoding getEncoding(int columnId) const = 0;
+    virtual proto::ColumnEncoding getEncoding(int64_t columnId) const = 0;
 
     /**
      * Get the stream for the given column/kind in this stripe.
@@ -55,7 +55,7 @@ namespace orc {
      * @return the new stream
      */
     virtual std::unique_ptr<SeekableInputStream>
-                    getStream(int columnId,
+                    getStream(int64_t columnId,
                               proto::Stream_Kind kind,
                               bool shouldStream) const = 0;
 
@@ -71,7 +71,7 @@ namespace orc {
   class ColumnReader {
   protected:
     std::unique_ptr<ByteRleDecoder> notNullDecoder;
-    int columnId;
+    int64_t columnId;
     MemoryPool& memoryPool;
 
   public:
@@ -84,7 +84,7 @@ namespace orc {
      * @param numValues the number of values to skip
      * @return the number of non-null values skipped
      */
-    virtual unsigned long skip(unsigned long numValues);
+    virtual uint64_t skip(uint64_t numValues);
 
     /**
      * Read the next group of values into this rowBatch.
@@ -95,7 +95,7 @@ namespace orc {
      *           set.
      */
     virtual void next(ColumnVectorBatch& rowBatch,
-                      unsigned long numValues,
+                      uint64_t numValues,
                       char* notNull);
   };
 

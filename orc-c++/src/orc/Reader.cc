@@ -35,7 +35,7 @@
 namespace orc {
 
   struct ReaderOptionsPrivate {
-    std::list<int> includedColumns;
+    std::list<int64_t> includedColumns;
     uint64_t dataStart;
     uint64_t dataLength;
     uint64_t tailLocation;
@@ -86,12 +86,12 @@ namespace orc {
     // PASS
   }
 
-  ReaderOptions& ReaderOptions::include(const std::list<int>& include) {
+  ReaderOptions& ReaderOptions::include(const std::list<int64_t>& include) {
     privateBits->includedColumns.assign(include.begin(), include.end());
     return *this;
   }
 
-  ReaderOptions& ReaderOptions::include(std::vector<int> include) {
+  ReaderOptions& ReaderOptions::include(std::vector<int64_t> include) {
     privateBits->includedColumns.assign(include.begin(), include.end());
     return *this;
   }
@@ -117,7 +117,7 @@ namespace orc {
     return privateBits->memoryPool;
   }
 
-  const std::list<int>& ReaderOptions::getInclude() const {
+  const std::list<int64_t>& ReaderOptions::getInclude() const {
     return privateBits->includedColumns;
   }
 
@@ -805,7 +805,7 @@ namespace orc {
     virtual const ColumnStatistics* getColumnStatistics(uint32_t columnId
                                                         ) const override {
       std::list<ColumnStatistics*>::const_iterator it = colStats.begin();
-      std::advance(it, static_cast<long>(columnId));
+      std::advance(it, static_cast<int64_t>(columnId));
       return *it;
     }
 
@@ -1007,10 +1007,10 @@ namespace orc {
 
     selectedColumns.assign(static_cast<size_t>(footer.types_size()), false);
 
-    const std::list<int>& included = options.getInclude();
-    for(std::list<int>::const_iterator columnId = included.begin();
+    const std::list<int64_t>& included = options.getInclude();
+    for(std::list<int64_t>::const_iterator columnId = included.begin();
         columnId != included.end(); ++columnId) {
-      if (*columnId <= static_cast<int>(schema->getSubtypeCount())) {
+      if (*columnId <= static_cast<int64_t>(schema->getSubtypeCount())) {
         selectTypeParent(static_cast<size_t>(*columnId));
         selectTypeChildren(static_cast<size_t>(*columnId));
       }
@@ -1111,7 +1111,7 @@ namespace orc {
     for(size_t parent=0; parent < columnId; ++parent) {
       const proto::Type& parentType = footer.types(static_cast<int>(parent));
       for(int idx=0; idx < parentType.subtypes_size(); ++idx) {
-        unsigned int child = parentType.subtypes(idx);
+        uint64_t child = parentType.subtypes(idx);
         if (child == columnId) {
           if (!selectedColumns[parent]) {
             selectedColumns[parent] = true;
@@ -1128,7 +1128,7 @@ namespace orc {
       selectedColumns[columnId] = true;
       const proto::Type& parentType = footer.types(static_cast<int>(columnId));
       for(int idx=0; idx < parentType.subtypes_size(); ++idx) {
-        unsigned int child = parentType.subtypes(idx);
+        uint64_t child = parentType.subtypes(idx);
         selectTypeChildren(child);
       }
     }
@@ -1180,10 +1180,10 @@ namespace orc {
 
   std::unique_ptr<ColumnStatistics>
   ReaderImpl::getColumnStatistics(uint32_t index) const {
-    if (index >= static_cast<unsigned int>(footer.statistics_size())) {
+    if (index >= static_cast<uint64_t>(footer.statistics_size())) {
       throw std::logic_error("column index out of range");
     }
-    proto::ColumnStatistics col = footer.statistics(static_cast<int>(index));
+    proto::ColumnStatistics col = footer.statistics(static_cast<int64_t>(index));
     return std::unique_ptr<ColumnStatistics> (convertColumnStatistics
                                               (col, hasCorrectStatistics()));
   }
@@ -1287,7 +1287,7 @@ namespace orc {
                          (new SeekableFileInputStream(stream.get(),
                                                       footerStart,
                                                       footerLength,
-                                                      static_cast<long>
+                                                      static_cast<int64_t>
                                                       (blockSize)
                                                       )),
                          blockSize,
@@ -1321,10 +1321,10 @@ namespace orc {
 
     virtual const std::vector<bool> getSelectedColumns() const override;
 
-    virtual proto::ColumnEncoding getEncoding(int columnId) const override;
+    virtual proto::ColumnEncoding getEncoding(int64_t columnId) const override;
 
     virtual std::unique_ptr<SeekableInputStream>
-    getStream(int columnId,
+    getStream(int64_t columnId,
               proto::Stream_Kind kind,
               bool shouldStream) const override;
 
@@ -1356,12 +1356,12 @@ namespace orc {
     return reader.getSelectedColumns();
   }
 
-  proto::ColumnEncoding StripeStreamsImpl::getEncoding(int columnId) const {
-    return footer.columns(columnId);
+  proto::ColumnEncoding StripeStreamsImpl::getEncoding(int64_t columnId) const {
+    return footer.columns(static_cast<int>(columnId));
   }
 
   std::unique_ptr<SeekableInputStream>
-  StripeStreamsImpl::getStream(int columnId,
+  StripeStreamsImpl::getStream(int64_t columnId,
                                proto::Stream_Kind kind,
                                bool shouldStream) const {
     uint64_t offset = stripeStart;
@@ -1369,8 +1369,8 @@ namespace orc {
       const proto::Stream& stream = footer.streams(i);
       if (stream.has_kind() &&
           stream.kind() == kind &&
-          stream.column() == static_cast<unsigned int>(columnId)) {
-        long myBlock = static_cast<long>(shouldStream ?
+          stream.column() == static_cast<uint64_t>(columnId)) {
+        int64_t myBlock = static_cast<int64_t>(shouldStream ?
                                          1024 * 1024 :
                                          stream.length());
         return createDecompressor(reader.getCompression(),
@@ -1446,7 +1446,7 @@ namespace orc {
   (const Type& type, uint64_t capacity) const {
     ColumnVectorBatch* result = nullptr;
     const Type* subtype;
-    switch (static_cast<int>(type.getKind())) {
+    switch (static_cast<int64_t>(type.getKind())) {
     case BOOLEAN:
     case BYTE:
     case SHORT:
@@ -1468,7 +1468,7 @@ namespace orc {
       break;
     case STRUCT:
       result = new StructVectorBatch(capacity, memoryPool);
-      for(unsigned int i=0; i < type.getSubtypeCount(); ++i) {
+      for(uint64_t i=0; i < type.getSubtypeCount(); ++i) {
         subtype = &(type.getSubtype(i));
         if (selectedColumns[static_cast<size_t>(subtype->getColumnId())]) {
           dynamic_cast<StructVectorBatch*>(result)->fields.push_back
@@ -1506,7 +1506,7 @@ namespace orc {
       break;
     case UNION:
       result = new UnionVectorBatch(capacity, memoryPool);
-      for(unsigned int i=0; i < type.getSubtypeCount(); ++i) {
+      for(uint64_t i=0; i < type.getSubtypeCount(); ++i) {
         subtype = &(type.getSubtype(i));
         if (selectedColumns[static_cast<size_t>(subtype->getColumnId())]) {
           dynamic_cast<UnionVectorBatch*>(result)->children.push_back

@@ -42,7 +42,7 @@ namespace orc {
     /**
      * Seek over a given number of values.
      */
-    virtual void skip(unsigned long numValues) = 0;
+    virtual void skip(uint64_t numValues) = 0;
 
     /**
      * Read a number of values into the batch.
@@ -51,7 +51,7 @@ namespace orc {
      * @param notNull If the pointer is null, all values are read. If the
      *    pointer is not null, positions that are false are skipped.
      */
-    virtual void next(int64_t* data, unsigned long numValues,
+    virtual void next(int64_t* data, uint64_t numValues,
                       const char* notNull) = 0;
   };
 

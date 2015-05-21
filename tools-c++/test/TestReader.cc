@@ -519,7 +519,7 @@ INSTANTIATE_TEST_CASE_P(TestReader1900, MatchTest,
 
   TEST(Reader, columnSelectionTest) {
     ReaderOptions opts;
-    std::list<int> includes = {1,3,5,7,9};
+    std::list<int64_t> includes = {1,3,5,7,9};
     opts.include(includes);
     std::ostringstream filename;
     filename << exampleDirectory << "/demo-11-none.orc";

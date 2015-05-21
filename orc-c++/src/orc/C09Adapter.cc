@@ -20,7 +20,7 @@
 #include <sstream>
 
 int64_t std::stoll(std::string str) {
-  long long val = 0;
+  int64_t val = 0;
   stringstream ss ;
   ss << str ;
   ss >> val ;

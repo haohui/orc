@@ -37,7 +37,7 @@ namespace orc {
     subtypeCount = 0;
   }
 
-  TypeImpl::TypeImpl(TypeKind _kind, unsigned int _maxLength) {
+  TypeImpl::TypeImpl(TypeKind _kind, uint64_t _maxLength) {
     columnId = 0;
     kind = _kind;
     maxLength = _maxLength;
@@ -46,8 +46,8 @@ namespace orc {
     subtypeCount = 0;
   }
 
-  TypeImpl::TypeImpl(TypeKind _kind, unsigned int _precision,
-                     unsigned int _scale) {
+  TypeImpl::TypeImpl(TypeKind _kind, uint64_t _precision,
+                     uint64_t _scale) {
     columnId = 0;
     kind = _kind;
     maxLength = 0;
@@ -64,7 +64,7 @@ namespace orc {
     maxLength = 0;
     precision = 0;
     scale = 0;
-    subtypeCount = static_cast<unsigned int>(types.size());
+    subtypeCount = static_cast<uint64_t>(types.size());
     subTypes.assign(types.begin(), types.end());
     fieldNames.assign(_fieldNames.begin(), _fieldNames.end());
   }
@@ -75,14 +75,14 @@ namespace orc {
     maxLength = 0;
     precision = 0;
     scale = 0;
-    subtypeCount = static_cast<unsigned int>(types.size());
+    subtypeCount = static_cast<uint64_t>(types.size());
     subTypes.assign(types.begin(), types.end());
   }
 
-  int TypeImpl::assignIds(int root) {
+  int64_t TypeImpl::assignIds(int64_t root) {
     columnId = root;
-    int current = root + 1;
-    for(unsigned int i=0; i < subtypeCount; ++i) {
+    int64_t current = root + 1;
+    for(uint64_t i=0; i < subtypeCount; ++i) {
       current = subTypes[i]->assignIds(current);
     }
     return current;
@@ -95,7 +95,7 @@ namespace orc {
     }
   }
 
-  int TypeImpl::getColumnId() const {
+  int64_t TypeImpl::getColumnId() const {
     return columnId;
   }
 
@@ -103,32 +103,32 @@ namespace orc {
     return kind;
   }
 
-  unsigned int TypeImpl::getSubtypeCount() const {
+  uint64_t TypeImpl::getSubtypeCount() const {
     return subtypeCount;
   }
 
-  const Type& TypeImpl::getSubtype(unsigned int i) const {
+  const Type& TypeImpl::getSubtype(uint64_t i) const {
     return *(subTypes[i]);
   }
 
-  const std::string& TypeImpl::getFieldName(unsigned int i) const {
+  const std::string& TypeImpl::getFieldName(uint64_t i) const {
     return fieldNames[i];
   }
 
-  unsigned int TypeImpl::getMaximumLength() const {
+  uint64_t TypeImpl::getMaximumLength() const {
     return maxLength;
   }
 
-  unsigned int TypeImpl::getPrecision() const {
+  uint64_t TypeImpl::getPrecision() const {
     return precision;
   }
 
-  unsigned int TypeImpl::getScale() const {
+  uint64_t TypeImpl::getScale() const {
     return scale;
   }
 
   std::string TypeImpl::toString() const {
-    switch (static_cast<int>(kind)) {
+    switch (static_cast<int64_t>(kind)) {
     case BOOLEAN:
       return "boolean";
     case BYTE:
@@ -205,12 +205,12 @@ namespace orc {
   }
 
   std::unique_ptr<Type> createCharType(TypeKind kind,
-                                       unsigned int maxLength) {
+                                       uint64_t maxLength) {
     return std::unique_ptr<Type>(new TypeImpl(kind, maxLength));
   }
 
-  std::unique_ptr<Type> createDecimalType(unsigned int precision,
-                                          unsigned int scale) {
+  std::unique_ptr<Type> createDecimalType(uint64_t precision,
+                                          uint64_t scale) {
     return std::unique_ptr<Type>(new TypeImpl(DECIMAL, precision, scale));
   }
 
@@ -268,7 +268,7 @@ namespace orc {
   std::string printProtobufMessage(const google::protobuf::Message& message);
   std::unique_ptr<Type> convertType(const proto::Type& type,
                                     const proto::Footer& footer) {
-    switch (static_cast<int>(type.kind())) {
+    switch (static_cast<int64_t>(type.kind())) {
 
     case proto::Type_Kind_BOOLEAN:
     case proto::Type_Kind_BYTE:
@@ -297,10 +297,10 @@ namespace orc {
     case proto::Type_Kind_LIST:
     case proto::Type_Kind_MAP:
     case proto::Type_Kind_UNION: {
-      unsigned long size = static_cast<unsigned long>(type.subtypes_size());
+      uint64_t size = static_cast<uint64_t>(type.subtypes_size());
       std::vector<Type*> typeList(size);
       for(int i=0; i < type.subtypes_size(); ++i) {
-        typeList[static_cast<unsigned int>(i)] =
+        typeList[static_cast<uint64_t>(i)] =
           convertType(footer.types(static_cast<int>(type.subtypes(i))),
                       footer).release();
       }
@@ -309,14 +309,14 @@ namespace orc {
     }
 
     case proto::Type_Kind_STRUCT: {
-      unsigned long size = static_cast<unsigned long>(type.subtypes_size());
+      uint64_t size = static_cast<uint64_t>(type.subtypes_size());
       std::vector<Type*> typeList(size);
       std::vector<std::string> fieldList(size);
       for(int i=0; i < type.subtypes_size(); ++i) {
-        typeList[static_cast<unsigned int>(i)] =
+        typeList[static_cast<uint64_t>(i)] =
           convertType(footer.types(static_cast<int>(type.subtypes(i))),
                       footer).release();
-        fieldList[static_cast<unsigned int>(i)] = type.fieldnames(i);
+        fieldList[static_cast<uint64_t>(i)] = type.fieldnames(i);
       }
       return std::unique_ptr<Type>
         (new TypeImpl(STRUCT, typeList, fieldList));
@@ -328,7 +328,7 @@ namespace orc {
 
   std::string kind2String(TypeKind t) {
       std::string name ;
-      switch(static_cast<int>(t)) {
+      switch(static_cast<int64_t>(t)) {
         case BOOLEAN: { name = "BOOLEAN"; break; }
         case BYTE: { name = "TINYINT"; break; }
         case SHORT: { name = "SMALLINT"; break; }

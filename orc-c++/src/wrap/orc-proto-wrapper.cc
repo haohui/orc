@@ -28,6 +28,7 @@
   #pragma clang diagnostic ignored "-Wunused-parameter"
   #pragma clang diagnostic ignored "-Wweak-vtables"
 #else
+  #pragma GCC diagnostic ignored "-Wconversion"
   #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 

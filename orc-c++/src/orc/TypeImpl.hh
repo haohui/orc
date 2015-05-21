@@ -29,14 +29,14 @@ namespace orc {
 
   class TypeImpl: public Type {
   private:
-    int columnId;
+    int64_t columnId;
     TypeKind kind;
     std::vector<Type*> subTypes;
     std::vector<std::string> fieldNames;
-    unsigned int subtypeCount;
-    unsigned int maxLength;
-    unsigned int precision;
-    unsigned int scale;
+    uint64_t subtypeCount;
+    uint64_t maxLength;
+    uint64_t precision;
+    uint64_t scale;
 
   public:
     /**
@@ -47,13 +47,13 @@ namespace orc {
     /**
      * Create char and varchar type.
      */
-    TypeImpl(TypeKind kind, unsigned int maxLength);
+    TypeImpl(TypeKind kind, uint64_t maxLength);
 
     /**
      * Create decimal type.
      */
-    TypeImpl(TypeKind kind, unsigned int precision,
-             unsigned int scale);
+    TypeImpl(TypeKind kind, uint64_t precision,
+             uint64_t scale);
 
     /**
      * Create struct type.
@@ -69,23 +69,23 @@ namespace orc {
 
     virtual ~TypeImpl();
 
-    int assignIds(int root) override;
+    int64_t assignIds(int64_t root) override;
 
-    int getColumnId() const override;
+    int64_t getColumnId() const override;
 
     TypeKind getKind() const override;
 
-    unsigned int getSubtypeCount() const override;
+    uint64_t getSubtypeCount() const override;
 
-    const Type& getSubtype(unsigned int i) const override;
+    const Type& getSubtype(uint64_t i) const override;
 
-    const std::string& getFieldName(unsigned int i) const override;
+    const std::string& getFieldName(uint64_t i) const override;
 
-    unsigned int getMaximumLength() const override;
+    uint64_t getMaximumLength() const override;
 
-    unsigned int getPrecision() const override;
+    uint64_t getPrecision() const override;
 
-    unsigned int getScale() const override;
+    uint64_t getScale() const override;
 
     std::string toString() const override;
   };

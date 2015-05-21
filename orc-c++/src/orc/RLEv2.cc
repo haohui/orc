@@ -81,9 +81,9 @@ inline uint32_t getClosestFixedBits(uint32_t n) {
   }
 }
 
-long RleDecoderV2::readLongBE(unsigned bsz) {
-  long ret = 0, val;
-  unsigned n = bsz;
+int64_t RleDecoderV2::readLongBE(uint64_t bsz) {
+  int64_t ret = 0, val;
+  uint64_t n = bsz;
   while (n > 0) {
     n--;
     val = readByte();
@@ -143,23 +143,23 @@ void RleDecoderV2::seek(PositionProvider& location) {
   skip(location.next());
 }
 
-void RleDecoderV2::skip(unsigned long numValues) {
+void RleDecoderV2::skip(uint64_t numValues) {
   // simple for now, until perf tests indicate something encoding specific is
   // needed
-  const unsigned long N = 64;
+  const uint64_t N = 64;
   int64_t dummy[N];
 
   while (numValues) {
-    unsigned long nRead = std::min(N, numValues);
+    uint64_t nRead = std::min(N, numValues);
     next(dummy, nRead, nullptr);
     numValues -= nRead;
   }
 }
 
 void RleDecoderV2::next(int64_t* const data,
-                        const unsigned long numValues,
+                        const uint64_t numValues,
                         const char* const notNull) {
-  unsigned long nRead = 0;
+  uint64_t nRead = 0;
 
   while (nRead < numValues) {
     // Skip any nulls before attempting to read first byte.
@@ -174,11 +174,11 @@ void RleDecoderV2::next(int64_t* const data,
       firstByte = readByte();
     }
 
-    unsigned long offset = nRead, length = numValues - nRead;
+    uint64_t offset = nRead, length = numValues - nRead;
 
     EncodingType enc = static_cast<EncodingType>
         ((firstByte >> 6) & 0x03);
-    switch(static_cast<int>(enc)) {
+    switch(static_cast<int64_t>(enc)) {
     case SHORT_REPEAT:
       nRead += nextShortRepeats(data, offset, length, notNull);
       break;
@@ -219,17 +219,17 @@ uint64_t RleDecoderV2::nextShortRepeats(int64_t* const data,
     }
   }
 
-  unsigned long nRead = std::min(runLength - runRead, numValues);
+  uint64_t nRead = std::min(runLength - runRead, numValues);
 
   if (notNull) {
-    for(unsigned long pos = offset; pos < offset + nRead; ++pos) {
+    for(uint64_t pos = offset; pos < offset + nRead; ++pos) {
       if (notNull[pos]) {
         data[pos] = firstValue;
         ++runRead;
       }
     }
   } else {
-    for(unsigned long pos = offset; pos < offset + nRead; ++pos) {
+    for(uint64_t pos = offset; pos < offset + nRead; ++pos) {
       data[pos] = firstValue;
       ++runRead;
     }
@@ -255,7 +255,7 @@ uint64_t RleDecoderV2::nextDirect(int64_t* const data,
     runRead = 0;
   }
 
-  unsigned long nRead = std::min(runLength - runRead, numValues);
+  uint64_t nRead = std::min(runLength - runRead, numValues);
 
   runRead += readLongs(data, offset, nRead, bitSize, notNull);
 
@@ -293,7 +293,7 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
     runRead = 0;
 
     // extract the number of bytes occupied by base
-    unsigned int thirdByte = readByte();
+    uint64_t thirdByte = readByte();
     byteSize = (thirdByte >> 5) & 0x07;
     // base width is one off
     byteSize += 1;
@@ -303,7 +303,7 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
     patchBitSize = decodeBitWidth(pwo);
 
     // read fourth byte and extract patch gap width
-    unsigned int fourthByte = readByte();
+    uint64_t fourthByte = readByte();
     uint32_t pgw = (fourthByte >> 5) & 0x07;
     // patch gap width is one off
     pgw += 1;
@@ -316,7 +316,7 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
 
     // read the next base width number of bytes to extract base value
     base = readLongBE(byteSize);
-    long mask = (1L << ((byteSize * 8) - 1));
+    int64_t mask = (1L << ((byteSize * 8) - 1));
     // if mask of base value is 1 then base is negative value else positive
     if ((base & mask) != 0) {
       base = base & ~mask;
@@ -349,19 +349,19 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
     adjustGapAndPatch();
   }
 
-  unsigned long nRead = std::min(runLength - runRead, numValues);
+  uint64_t nRead = std::min(runLength - runRead, numValues);
 
-  for(unsigned long pos = offset; pos < offset + nRead; ++pos) {
+  for(uint64_t pos = offset; pos < offset + nRead; ++pos) {
     // skip null positions
     if (notNull && !notNull[pos]) {
       continue;
     }
-    if (static_cast<long>(unpackedIdx) != actualGap) {
+    if (static_cast<int64_t>(unpackedIdx) != actualGap) {
       // no patching required. add base to unpacked value to get final value
       data[pos] = base + unpacked[unpackedIdx];
     } else {
       // extract the patch value
-      long patchedVal = unpacked[unpackedIdx] | (curPatch << bitSize);
+      int64_t patchedVal = unpacked[unpackedIdx] | (curPatch << bitSize);
 
       // add base to patched value
       data[pos] = base + patchedVal;
@@ -405,21 +405,21 @@ uint64_t RleDecoderV2::nextDelta(int64_t* const data,
 
     // read the first value stored as vint
     if (isSigned) {
-      firstValue = static_cast<long>(readVslong());
+      firstValue = static_cast<int64_t>(readVslong());
     } else {
-      firstValue = static_cast<long>(readVulong());
+      firstValue = static_cast<int64_t>(readVulong());
     }
 
     prevValue = firstValue;
 
     // read the fixed delta value stored as vint (deltas can be negative even
     // if all number are positive)
-    deltaBase = static_cast<long>(readVslong());
+    deltaBase = static_cast<int64_t>(readVslong());
   }
 
-  unsigned long nRead = std::min(runLength - runRead, numValues);
+  uint64_t nRead = std::min(runLength - runRead, numValues);
 
-  unsigned long pos = offset;
+  uint64_t pos = offset;
   for ( ; pos < offset + nRead; ++pos) {
     // skip null positions
     if (!notNull || notNull[pos]) break;
@@ -453,7 +453,7 @@ uint64_t RleDecoderV2::nextDelta(int64_t* const data,
     // write the unpacked values, add it to previous value and store final
     // value to result buffer. if the delta base value is negative then it
     // is a decreasing sequence else an increasing sequence
-    unsigned long remaining = (offset + nRead) - pos;
+    uint64_t remaining = (offset + nRead) - pos;
     runRead += readLongs(data, pos, remaining, bitSize, notNull);
 
     if (deltaBase < 0) {

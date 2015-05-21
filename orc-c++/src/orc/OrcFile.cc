@@ -99,7 +99,7 @@ namespace orc {
       if (bytesRead == -1) {
         throw ParseError("Bad read of " + filename);
       }
-      if (static_cast<unsigned long>(bytesRead) != length) {
+      if (static_cast<uint64_t>(bytesRead) != length) {
         throw ParseError("Short read of " + filename);
       }
       return buffer;
@@ -197,7 +197,7 @@ namespace orc {
   }
 
   MmapInputStream::~MmapInputStream() {
-    int result = munmap(reinterpret_cast<void*>(start), totalLength);
+    int64_t result = munmap(reinterpret_cast<void*>(start), totalLength);
     if (result != 0) {
       throw std::runtime_error("Failed to unmap " + filename + " - " +
                                strerror(errno));

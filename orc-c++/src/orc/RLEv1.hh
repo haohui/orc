@@ -38,12 +38,12 @@ public:
     /**
     * Seek over a given number of values.
     */
-    void skip(unsigned long numValues) override;
+    void skip(uint64_t numValues) override;
 
     /**
     * Read a number of values into the batch.
     */
-    void next(int64_t* data, unsigned long numValues,
+    void next(int64_t* data, uint64_t numValues,
               const char* notNull) override;
 
 private:
@@ -51,17 +51,17 @@ private:
 
     inline void readHeader();
 
-    inline unsigned long readLong();
+    inline uint64_t readLong();
 
-    inline void skipLongs(unsigned long numValues);
+    inline void skipLongs(uint64_t numValues);
 
     const std::unique_ptr<SeekableInputStream> inputStream;
     const bool isSigned;
-    unsigned long remainingValues;
+    uint64_t remainingValues;
     int64_t value;
     const char *bufferStart;
     const char *bufferEnd;
-    int delta;
+    int64_t delta;
     bool repeating;
 };
 }  // namespace orc

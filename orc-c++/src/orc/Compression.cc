@@ -40,7 +40,7 @@ namespace orc {
       for(uint64_t byte = 0;
           byte < width && line * width + byte < length; ++byte) {
         out << " " << std::setfill('0') << std::setw(2)
-                  << static_cast<unsigned int>(0xff & buffer[line * width +
+                  << static_cast<uint64_t>(0xff & buffer[line * width +
                                                              byte]);
       }
       out << "\n";
@@ -69,7 +69,7 @@ namespace orc {
   #if __cplusplus >= 201103L
     SeekableArrayInputStream::SeekableArrayInputStream
        (std::initializer_list<unsigned char> values,
-        long blkSize
+        int64_t blkSize
         ):ownedData(new DataBuffer<char>(*getDefaultPool(), values.size())),
           data(0) {
       length = values.size();
@@ -82,7 +82,7 @@ namespace orc {
   SeekableArrayInputStream::SeekableArrayInputStream
                (const unsigned char* values,
                 uint64_t size,
-                long blkSize
+                int64_t blkSize
                 ): data(reinterpret_cast<const char*>(values)) {
     length = size;
     position = 0;
@@ -91,7 +91,7 @@ namespace orc {
 
   SeekableArrayInputStream::SeekableArrayInputStream(const char* values,
                                                      uint64_t size,
-                                                     long blkSize
+                                                     int64_t blkSize
                                                      ): data(values) {
     length = size;
     position = 0;
@@ -148,7 +148,7 @@ namespace orc {
     return result.str();
   }
 
-  static uint64_t computeBlock(long request, uint64_t length) {
+  static uint64_t computeBlock(int64_t request, uint64_t length) {
     return std::min(length,
                     static_cast<uint64_t>(request < 0 ?
                                           256 * 1024 : request));
@@ -157,7 +157,7 @@ namespace orc {
   SeekableFileInputStream::SeekableFileInputStream(InputStream* stream,
                                                    uint64_t offset,
                                                    uint64_t byteCount,
-                                                   long _blockSize
+                                                   int64_t _blockSize
                                                    ): input(stream),
                                                       start(offset),
                                                       length(byteCount),
@@ -342,7 +342,7 @@ namespace orc {
     zstream.opaque = Z_NULL;
     zstream.next_out = reinterpret_cast<Bytef*>(buffer.data());
     zstream.avail_out = static_cast<uInt>(blockSize);
-    int result = inflateInit2(&zstream, -15);
+    int64_t result = inflateInit2(&zstream, -15);
     switch (result) {
     case Z_OK:
       break;
@@ -367,7 +367,7 @@ namespace orc {
 #pragma GCC diagnostic pop
 
   ZlibDecompressionStream::~ZlibDecompressionStream() {
-    int result = inflateEnd(&zstream);
+    int64_t result = inflateEnd(&zstream);
     if (result != Z_OK) {
       // really can't throw in destructors
       std::cout << "Error in ~ZlibDecompressionStream() " << result << "\n";
@@ -412,7 +412,7 @@ namespace orc {
         throw std::logic_error("Bad inflateReset in "
                                "ZlibDecompressionStream::Next");
       }
-      int result;
+      int64_t result;
       do {
         result = inflate(&zstream, availSize == remainingLength ? Z_FINISH :
                          Z_SYNC_FLUSH);
@@ -741,7 +741,7 @@ namespace orc {
                         std::unique_ptr<SeekableInputStream> input,
                         uint64_t blockSize,
                         MemoryPool& pool) {
-    switch (static_cast<int>(kind)) {
+    switch (static_cast<int64_t>(kind)) {
     case CompressionKind_NONE:
       return std::move(input);
     case CompressionKind_ZLIB:

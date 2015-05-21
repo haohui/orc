@@ -31,7 +31,7 @@ namespace orc {
                           bool isSigned,
                           RleVersion version,
                           MemoryPool& pool) {
-    switch (static_cast<int>(version)) {
+    switch (static_cast<int64_t>(version)) {
     case RleVersion_1:
       // We don't have std::make_unique() yet.
       return std::unique_ptr<RleDecoder>(new RleDecoderV1(std::move(input),

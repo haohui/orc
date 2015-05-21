@@ -46,12 +46,12 @@ namespace orc {
     /**
      * Seek over a given number of values.
      */
-    virtual void skip(unsigned long numValues);
+    virtual void skip(uint64_t numValues);
 
     /**
      * Read a number of values into the batch.
      */
-    virtual void next(char* data, unsigned long numValues, char* notNull);
+    virtual void next(char* data, uint64_t numValues, char* notNull);
 
   protected:
     inline void nextBuffer();
@@ -121,7 +121,7 @@ namespace orc {
     skip(location.next());
   }
 
-  void ByteRleDecoderImpl::skip(unsigned long numValues) {
+  void ByteRleDecoderImpl::skip(uint64_t numValues) {
     while (numValues > 0) {
       if (remainingValues == 0) {
         readHeader();
@@ -147,9 +147,9 @@ namespace orc {
     }
   }
 
-  void ByteRleDecoderImpl::next(char* data, unsigned long numValues,
+  void ByteRleDecoderImpl::next(char* data, uint64_t numValues,
                                 char* notNull) {
-    unsigned long position = 0;
+    uint64_t position = 0;
     // skip over null values
     while (notNull && position < numValues && !notNull[position]) {
       position += 1;
@@ -162,10 +162,10 @@ namespace orc {
       // how many do we read out of this block?
       size_t count = std::min(static_cast<size_t>(numValues - position),
                               remainingValues);
-      unsigned long consumed = 0;
+      uint64_t consumed = 0;
       if (repeating) {
         if (notNull) {
-          for(unsigned long i=0; i < count; ++i) {
+          for(uint64_t i=0; i < count; ++i) {
             if (notNull[position + i]) {
               data[position + i] = value;
               consumed += 1;
@@ -177,21 +177,21 @@ namespace orc {
         }
       } else {
         if (notNull) {
-          for(unsigned long i=0; i < count; ++i) {
+          for(uint64_t i=0; i < count; ++i) {
             if (notNull[position + i]) {
               data[position + i] = readByte();
               consumed += 1;
             }
           }
         } else {
-          unsigned long i = 0;
+          uint64_t i = 0;
           while (i < count) {
             if (bufferStart == bufferEnd) {
               nextBuffer();
             }
-            unsigned long copyBytes =
-              std::min(static_cast<unsigned long>(count - i),
-                       static_cast<unsigned long>(bufferEnd - bufferStart));
+            uint64_t copyBytes =
+              std::min(static_cast<uint64_t>(count - i),
+                       static_cast<uint64_t>(bufferEnd - bufferStart));
             memcpy(data + position + i, bufferStart, copyBytes);
             bufferStart += copyBytes;
             i += copyBytes;
@@ -228,12 +228,12 @@ namespace orc {
     /**
      * Seek over a given number of values.
      */
-    virtual void skip(unsigned long numValues);
+    virtual void skip(uint64_t numValues);
 
     /**
      * Read a number of values into the batch.
      */
-    virtual void next(char* data, unsigned long numValues, char* notNull);
+    virtual void next(char* data, uint64_t numValues, char* notNull);
 
   protected:
     size_t remainingBits;
@@ -253,7 +253,7 @@ namespace orc {
 
   void BooleanRleDecoderImpl::seek(PositionProvider& location) {
     ByteRleDecoderImpl::seek(location);
-    unsigned long consumed = location.next();
+    uint64_t consumed = location.next();
     if (consumed > 8) {
       throw ParseError("bad position");
     }
@@ -263,22 +263,22 @@ namespace orc {
     }
   }
 
-  void BooleanRleDecoderImpl::skip(unsigned long numValues) {
+  void BooleanRleDecoderImpl::skip(uint64_t numValues) {
     if (numValues <= remainingBits) {
       remainingBits -= numValues;
     } else {
       numValues -= remainingBits;
-      unsigned long bytesSkipped = numValues / 8;
+      uint64_t bytesSkipped = numValues / 8;
       ByteRleDecoderImpl::skip(bytesSkipped);
       ByteRleDecoderImpl::next(&lastByte, 1, 0);
       remainingBits = 8 - (numValues % 8);
     }
   }
 
-  void BooleanRleDecoderImpl::next(char* data, unsigned long numValues,
+  void BooleanRleDecoderImpl::next(char* data, uint64_t numValues,
                                    char* notNull) {
     // next spot to fill in
-    unsigned long position = 0;
+    uint64_t position = 0;
 
     // use up any remaining bits
     if (notNull) {
@@ -301,9 +301,9 @@ namespace orc {
     }
 
     // count the number of nonNulls remaining
-    unsigned long nonNulls = numValues - position;
+    uint64_t nonNulls = numValues - position;
     if (notNull) {
-      for(unsigned long i=position; i < numValues; ++i) {
+      for(uint64_t i=position; i < numValues; ++i) {
         if (!notNull[i]) {
           nonNulls -= 1;
         }
@@ -317,17 +317,17 @@ namespace orc {
       }
     } else if (position < numValues) {
       // read the new bytes into the array
-      unsigned long bytesRead = (nonNulls + 7) / 8;
+      uint64_t bytesRead = (nonNulls + 7) / 8;
       ByteRleDecoderImpl::next(data + position, bytesRead, 0);
       lastByte = data[position + bytesRead - 1];
       remainingBits = bytesRead * 8 - nonNulls;
       // expand the array backwards so that we don't clobber the data
-      unsigned long bitsLeft = bytesRead * 8 - remainingBits;
+      uint64_t bitsLeft = bytesRead * 8 - remainingBits;
       if (notNull) {
-        for(long i=static_cast<long>(numValues) - 1;
-            i >= static_cast<long>(position); --i) {
+        for(int64_t i=static_cast<int64_t>(numValues) - 1;
+            i >= static_cast<int64_t>(position); --i) {
           if (notNull[i]) {
-            unsigned long shiftPosn = (-bitsLeft) % 8;
+            uint64_t shiftPosn = (-bitsLeft) % 8;
             data[i] = (data[position + (bitsLeft - 1) / 8] >> shiftPosn) & 0x1;
             bitsLeft -= 1;
           } else {
@@ -335,9 +335,9 @@ namespace orc {
           }
         }
       } else {
-        for(long i=static_cast<long>(numValues) - 1;
-            i >= static_cast<long>(position); --i, --bitsLeft) {
-          unsigned long shiftPosn = (-bitsLeft) % 8;
+        for(int64_t i=static_cast<int64_t>(numValues) - 1;
+            i >= static_cast<int64_t>(position); --i, --bitsLeft) {
+          uint64_t shiftPosn = (-bitsLeft) % 8;
           data[i] = (data[position + (bitsLeft - 1) / 8] >> shiftPosn) & 0x1;
         }
       }

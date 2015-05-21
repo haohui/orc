@@ -416,7 +416,7 @@ namespace orc {
      * @param include a list of columns to read
      * @return this
      */
-    ReaderOptions& include(const std::list<int>& include);
+    ReaderOptions& include(const std::list<int64_t>& include);
 
     /**
      * Set the list of columns to read. All columns that are children of
@@ -425,7 +425,7 @@ namespace orc {
      * @param include a list of columns to read
      * @return this
      */
-    ReaderOptions& include(std::vector<int> include);
+    ReaderOptions& include(std::vector<int64_t> include);
 
     /**
      * Set the section of the file to process.
@@ -482,7 +482,7 @@ namespace orc {
      * Get the list of selected columns to read. All children of the selected
      * columns are also selected.
      */
-    const std::list<int>& getInclude() const;
+    const std::list<int64_t>& getInclude() const;
 
     /**
      * Get the start of the range for the data being processed.

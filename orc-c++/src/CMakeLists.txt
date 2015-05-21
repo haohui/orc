@@ -29,8 +29,12 @@ add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
+endif ()
+
 if (C09)
-  set (ADAOPTOR_CLASS "orc/C09Adapter.cc")
+  set (ADAPTOR_CLASS "orc/C09Adapter.cc")
 endif (C09)
 
 add_library (orc STATIC

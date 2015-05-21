@@ -209,7 +209,7 @@ namespace orc {
   std::unique_ptr<ColumnPrinter> createColumnPrinter(std::string& buffer,
                                                      const Type& type) {
     ColumnPrinter *result;
-    switch(static_cast<int>(type.getKind())) {
+    switch(static_cast<int64_t>(type.getKind())) {
     case BOOLEAN:
       result = new BooleanColumnPrinter(buffer, type);
       break;
@@ -290,8 +290,8 @@ namespace orc {
       writeString(buffer, "null");
     } else {
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%lld",
-               static_cast<long long int>(data[rowId]));
+      snprintf(numBuffer, sizeof(numBuffer), "%ld",
+               static_cast<int64_t >(data[rowId]));
       writeString(buffer, numBuffer);
     }
   }
@@ -407,7 +407,7 @@ namespace orc {
       writeString(buffer, "null");
     } else {
       writeChar(buffer, '"');
-      for(int i=0; i < length[rowId]; ++i) {
+      for(int64_t i=0; i < length[rowId]; ++i) {
         char ch = static_cast<char>(start[rowId][i]);
         switch (ch) {
         case '\\':
@@ -505,7 +505,7 @@ namespace orc {
   UnionColumnPrinter::UnionColumnPrinter(std::string& buffer,
                                            const Type& type
                                            ): ColumnPrinter(buffer, type) {
-    for(unsigned i=0; i < type.getSubtypeCount(); ++i) {
+    for(unsigned int i=0; i < type.getSubtypeCount(); ++i) {
       fieldPrinter.push_back(createColumnPrinter(buffer, type.getSubtype(i))
                              .release());
     }
@@ -534,8 +534,8 @@ namespace orc {
     } else {
       writeString(buffer, "{\"tag\": ");
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%d",
-               static_cast<int>(tags[rowId]));
+      snprintf(numBuffer, sizeof(numBuffer), "%ld",
+               static_cast<int64_t>(tags[rowId]));
       writeString(buffer, numBuffer);
       writeString(buffer, ", \"value\": ");
       fieldPrinter[tags[rowId]]->printRow(offsets[rowId]);
@@ -546,7 +546,7 @@ namespace orc {
   StructColumnPrinter::StructColumnPrinter(std::string& buffer,
                                            const Type& type
                                            ): ColumnPrinter(buffer, type) {
-    for(unsigned i=0; i < type.getSubtypeCount(); ++i) {
+    for(unsigned int i=0; i < type.getSubtypeCount(); ++i) {
       fieldPrinter.push_back(createColumnPrinter(buffer, type.getSubtype(i))
                              .release());
     }
@@ -572,7 +572,7 @@ namespace orc {
       writeString(buffer, "null");
     } else {
       writeChar(buffer, '{');
-      for(unsigned i=0; i < fieldPrinter.size(); ++i) {
+      for(unsigned int i=0; i < fieldPrinter.size(); ++i) {
         if (i != 0) {
           writeString(buffer, ", ");
         }
@@ -697,7 +697,7 @@ namespace orc {
       writeString(buffer, timeBuffer);
       writeChar(buffer, '.');
       // remove trailing zeros off the back of the nanos value.
-      int zeroDigits = 0;
+      int64_t zeroDigits = 0;
       if (nanos == 0) {
         zeroDigits = 8;
       } else {
@@ -707,9 +707,9 @@ namespace orc {
         }
       }
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%0*lld\"",
+      snprintf(numBuffer, sizeof(numBuffer), "%0*ld\"",
                static_cast<int>(NANO_DIGITS - zeroDigits),
-               static_cast<long long int>(nanos));
+               static_cast<int64_t >(nanos));
       writeString(buffer, numBuffer);
     }
   }
