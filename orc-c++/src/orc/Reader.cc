@@ -1183,7 +1183,8 @@ namespace orc {
     if (index >= static_cast<uint64_t>(footer.statistics_size())) {
       throw std::logic_error("column index out of range");
     }
-    proto::ColumnStatistics col = footer.statistics(static_cast<int64_t>(index));
+    proto::ColumnStatistics col =
+      footer.statistics(static_cast<int32_t>(index));
     return std::unique_ptr<ColumnStatistics> (convertColumnStatistics
                                               (col, hasCorrectStatistics()));
   }

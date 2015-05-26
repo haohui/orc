@@ -17,6 +17,7 @@
  */
 
 #include "orc/ColumnPrinter.hh"
+#include "orc/orc-config.hh"
 
 #include <limits>
 #include <sstream>
@@ -290,7 +291,7 @@ namespace orc {
       writeString(buffer, "null");
     } else {
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%ld",
+      snprintf(numBuffer, sizeof(numBuffer), "%" INT64_FORMAT_STRING "d",
                static_cast<int64_t >(data[rowId]));
       writeString(buffer, numBuffer);
     }
@@ -534,7 +535,7 @@ namespace orc {
     } else {
       writeString(buffer, "{\"tag\": ");
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%ld",
+      snprintf(numBuffer, sizeof(numBuffer), "%" INT64_FORMAT_STRING "d",
                static_cast<int64_t>(tags[rowId]));
       writeString(buffer, numBuffer);
       writeString(buffer, ", \"value\": ");
@@ -707,7 +708,7 @@ namespace orc {
         }
       }
       char numBuffer[64];
-      snprintf(numBuffer, sizeof(numBuffer), "%0*ld\"",
+      snprintf(numBuffer, sizeof(numBuffer), "%0*" INT64_FORMAT_STRING "d\"",
                static_cast<int>(NANO_DIGITS - zeroDigits),
                static_cast<int64_t >(nanos));
       writeString(buffer, numBuffer);

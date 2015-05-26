@@ -16,5 +16,12 @@
 #define ORC_CONFIG_HH
 
 #define ORC_VERSION "@ORC_VERSION@"
+#cmakedefine INT64_IS_LL
+
+#ifdef INT64_IS_LL
+  #define INT64_FORMAT_STRING "ll"
+#else
+  #define INT64_FORMAT_STRING "l"
+#endif
 
 #endif

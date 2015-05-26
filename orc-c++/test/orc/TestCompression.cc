@@ -627,8 +627,8 @@ namespace orc {
     const void *data;
     int length;
     // skip 1/2; in 2 jumps
-    ASSERT_TRUE(result->Skip(((N / 2) - 2) * sizeof(int)));
-    ASSERT_TRUE(result->Skip(2 * sizeof(int)));
+    ASSERT_TRUE(result->Skip(static_cast<int>(((N / 2) - 2) * sizeof(int))));
+    ASSERT_TRUE(result->Skip(static_cast<int>(2 * sizeof(int))));
     ASSERT_TRUE(result->Next(&data, &length));
     ASSERT_EQ((N / 2) * sizeof(int), length);
     for (int i=N/2; i < N; ++i) {

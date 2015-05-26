@@ -316,7 +316,7 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
 
     // read the next base width number of bytes to extract base value
     base = readLongBE(byteSize);
-    int64_t mask = (1L << ((byteSize * 8) - 1));
+    int64_t mask = (static_cast<int64_t>(1) << ((byteSize * 8) - 1));
     // if mask of base value is 1 then base is negative value else positive
     if ((base & mask) != 0) {
       base = base & ~mask;
@@ -336,7 +336,8 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
     // TODO: Skip corrupt?
     //    if ((patchBitSize + pgw) > 64 && !skipCorrupt) {
     if ((patchBitSize + pgw) > 64) {
-      throw ParseError("Corrupt PATCHED_BASE encoded data (patchBitSize + pgw > 64)!");
+      throw ParseError("Corrupt PATCHED_BASE encoded data "
+                       "(patchBitSize + pgw > 64)!");
     }
     uint32_t cfb = getClosestFixedBits(patchBitSize + pgw);
     readLongs(unpackedPatch.data(), 0, pl, cfb);
@@ -344,7 +345,7 @@ uint64_t RleDecoderV2::nextPatched(int64_t* const data,
     resetReadLongs();
 
     // apply the patch directly when decoding the packed data
-    patchMask = ((1L << patchBitSize) - 1);
+    patchMask = ((static_cast<int64_t>(1) << patchBitSize) - 1);
 
     adjustGapAndPatch();
   }

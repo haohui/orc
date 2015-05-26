@@ -19,7 +19,7 @@ include_directories (
   )
 
 add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
-   COMMAND mkdir "${CMAKE_BINARY_DIR}/orc-java" &&
+   COMMAND mkdir -p "${CMAKE_BINARY_DIR}/orc-java" &&
      ${CMAKE_BINARY_DIR}/orc-c++/libs/protobuf-${PROTOBUF_VERSION}/protoc
         -I ${CMAKE_SOURCE_DIR}/proto
         --cpp_out="${CMAKE_CURRENT_BINARY_DIR}"
@@ -28,10 +28,6 @@ add_custom_command(OUTPUT orc_proto.pb.h orc_proto.pb.cc
 )
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} ${WARN_FLAGS}")
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-endif ()
 
 if (C09)
   set (ADAPTOR_CLASS "orc/C09Adapter.cc")

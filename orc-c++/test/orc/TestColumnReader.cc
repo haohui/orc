@@ -42,7 +42,7 @@ public:
   MOCK_CONST_METHOD0(getSelectedColumns, const std::vector<bool>());
   MOCK_CONST_METHOD1(getEncoding, proto::ColumnEncoding (int64_t));
   MOCK_CONST_METHOD3(getStreamProxy, SeekableInputStream*
-                     (int, proto::Stream_Kind, bool));
+                     (int64_t, proto::Stream_Kind, bool));
   MemoryPool& getMemoryPool() const {
     return *getDefaultPool();
   }
@@ -640,8 +640,8 @@ TEST(TestColumnReader, testSkipWithNulls) {
   char digits[200];
   for (int i = 0; i < 10; ++i) {
     for (int j = 0; j < 10; ++j) {
-      digits[2 * (10 * i + j)] = '0' + static_cast<char>(i);
-      digits[2 * (10 * i + j) + 1] = '0' + static_cast<char>(j);
+      digits[2 * (10 * i + j)] = static_cast<char>('0' + i);
+      digits[2 * (10 * i + j) + 1] = static_cast<char>('0' + j);
     }
   }
   EXPECT_CALL(streams, getStreamProxy(2, proto::Stream_Kind_DICTIONARY_DATA,
@@ -782,8 +782,8 @@ TEST(TestColumnReader, testBinaryDirectWithNulls) {
   char blob[256];
   for (size_t i = 0; i < 8; ++i) {
     for (size_t j = 0; j < 16; ++j) {
-      blob[2 * (16 * i + j)] = 'A' + static_cast<char>(i);
-      blob[2 * (16 * i + j) + 1] = 'A' + static_cast<char>(j);
+      blob[2 * (16 * i + j)] = static_cast<char>('A' + i);
+      blob[2 * (16 * i + j) + 1] = static_cast<char>('A' + j);
     }
   }
   EXPECT_CALL(streams, getStreamProxy(1, proto::Stream_Kind_DATA, true))
@@ -951,8 +951,8 @@ TEST(TestColumnReader, testStringDirectShortBufferWithNulls) {
   char blob[512];
   for (size_t i = 0; i < 16; ++i) {
     for (size_t j = 0; j < 16; ++j) {
-      blob[2 * (16 * i + j)] = 'A' + static_cast<char>(i);
-      blob[2 * (16 * i + j) + 1] = 'A' + static_cast<char>(j);
+      blob[2 * (16 * i + j)] = static_cast<char>('A' + i);
+      blob[2 * (16 * i + j) + 1] = static_cast<char>('A' + j);
     }
   }
   EXPECT_CALL(streams, getStreamProxy(1, proto::Stream_Kind_DATA, true))
@@ -2605,7 +2605,7 @@ TEST(TestColumnReader, testTimestampSkipWithNulls) {
       EXPECT_EQ(0, longBatch->notNull[i]);
     } else {
       EXPECT_EQ(1, longBatch->notNull[i]);
-      EXPECT_DOUBLE_EQ(test_vals[vals_ix], longBatch->data[i]);
+      EXPECT_EQ(test_vals[vals_ix], longBatch->data[i]);
       vals_ix++;
     }
   }
@@ -3591,7 +3591,7 @@ TEST(DecimalColumnReader, testDecimalHive11BigBatches) {
   // range(64) * 32
   unsigned char numBuffer[2048];
   for(size_t i=0; i < 2048; ++i) {
-    numBuffer[i] = (i % 64) * 2;
+    numBuffer[i] = static_cast<unsigned char>((i % 64) * 2);
   }
   EXPECT_CALL(streams, getStreamProxy(1, proto::Stream_Kind_DATA, true))
     .WillRepeatedly(testing::Return(new SeekableArrayInputStream(numBuffer,

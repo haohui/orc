@@ -10,29 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-configure_file (
-  "include/orc/orc-config.hh.in"
-  "include/orc/orc-config.hh"
-  )
-
 include_directories (
+  ${CMAKE_CURRENT_BINARY_DIR}/include
   "include"
   )
 
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/include/orc/orc-config.hh"
-  "include/orc/C09Adapter.hh"
-  "include/orc/ColumnPrinter.hh"
-  "include/orc/Int128.hh"
-  "include/orc/MemoryPool.hh"
-  "include/orc/OrcFile.hh"
-  "include/orc/Reader.hh"
-  "include/orc/Vector.hh"
-  DESTINATION "include/orc"
-  )
-
+add_subdirectory(include)
 add_subdirectory(libs)
 add_subdirectory(src)
+
 if(NOT C09)
   add_subdirectory(test)
 endif(NOT C09)
